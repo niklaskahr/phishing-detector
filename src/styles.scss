@@ -1,1 +1,34 @@
-/* You can add global styles to this file, and also import other style files */
+@import './assets/fonts.scss';
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: 'Overpass', sans-serif;
+    color: black !important;
+    text-align: justify;
+    background-color: #F9F9FF;
+    background-image: radial-gradient(circle, #dadaec 1px, transparent 1px);
+    background-size: 7.14vw 7.14vw;
+    margin: 0 12vw;
+}
+
+.logo {
+    object-fit: contain;
+    cursor: pointer;
+}
+
+h1 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    font-family: 'Syne';
+    font-weight: 800;
+    font-size: 26px;
+    line-height: 100%;
+    letter-spacing: -0.025em;
+    margin-block-start: 0;
+    margin-block-end: 0
+}
