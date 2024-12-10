@@ -1,0 +1,6 @@
+<div class="overlay" (drop)="handleDrop($event)" (dragover)="handleDragOver($event)">
+    <span class="file-format">.eml</span>
+    <span>Drop your file here.</span>
+    <span *ngIf="showQuantityErrorMessage" class="error-message">Please drop only one file.</span>
+    <span *ngIf="showFileErrorMessage" class="error-message">Please drop a .eml file.</span>
+</div>

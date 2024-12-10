@@ -1,5 +1,5 @@
 .home-container {
-    height: calc(100vh - 15vh);
+    height: calc(100vh - 20vh);
     width: 100%;
     display: flex;
     align-items: center;
@@ -7,27 +7,11 @@
     div:nth-child(1) {
         width: 55%;
         text-align: center;
-        padding-right: 0.5em;
+        margin-right: 0.5em;
     }
 
-    .dropZone {
+    app-drop-zone {
         width: 50%;
         height: 55%;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        font-weight: 700;
-        color: #FF9900;
-        background-color: #FFFCF3;
-        padding-left: 0.5em;
-        border: 3px dashed #F2DFCC;
-        border-radius: 10px;
-
-        .file-format {
-            font-size: 24px;
-            font-weight: normal;
-            color: #989899;
-        }
     }
 }
