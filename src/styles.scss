@@ -14,11 +14,6 @@ body {
     margin: 0 12vw;
 }
 
-.logo {
-    object-fit: contain;
-    cursor: pointer;
-}
-
 h1 {
     display: flex;
     justify-content: center;
@@ -31,4 +26,38 @@ h1 {
     letter-spacing: -0.025em;
     margin-block-start: 0;
     margin-block-end: 0
+}
+
+a {
+    position: relative;
+    height: fit-content;
+    text-decoration: none;
+    font-weight: 700;
+    color: inherit;
+    cursor: pointer;
+}
+
+.standard-font {
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 120%;
+}
+
+.error-message {
+    color: #E23164;
+    position: absolute;
+    bottom: 3em;
+}
+
+.logo {
+    object-fit: contain;
+    cursor: pointer;
+}
+
+.inverted {
+    filter: invert(1);
+}
+
+.mb-1 {
+    margin-bottom: 0.5rem;
 }
