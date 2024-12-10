@@ -13,10 +13,16 @@
     margin-left: 0.5em;
     border: 3px dashed #F2DFCC;
     border-radius: 10px;
+    transition: color 0.25s cubic-bezier(0.4, 0, 0.2, 1), filter 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 
     .file-format {
         font-size: 24px;
         font-weight: normal;
         color: #989899;
+    }
+
+    &.drag-hover {
+        color: #AD94F7;
+        filter: brightness(0.98);
     }
 }

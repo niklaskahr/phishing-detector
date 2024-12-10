@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { EmailProcessorService } from '../services/email-processor.service';
 
 @Component({
   selector: 'app-drop-zone',
@@ -9,11 +10,14 @@ import { CommonModule } from '@angular/common';
   styleUrl: './drop-zone.component.scss'
 })
 export class DropZoneComponent {
-  showQuantityErrorMessage = false;
-  showFileErrorMessage = false;
+  isHovered: boolean = false;
+  errorMessage: string | null = null;
+
+  constructor(private emailProcessor: EmailProcessorService) { }
 
   handleDrop(event: DragEvent): void {
-    this.showFileErrorMessage = false;
+    this.isHovered = false;
+    this.errorMessage = null;
 
     if (!event.dataTransfer) {
       console.error("No dataTransfer found on the event.");
@@ -21,45 +25,32 @@ export class DropZoneComponent {
     }
 
     event.preventDefault(); // prevent file from being opened
+    const item = event.dataTransfer.items[0];
 
-    if (event.dataTransfer.items) {
-      const item = event.dataTransfer.items[0];
+    if (event.dataTransfer.items.length > 1 || !item) {
+      this.errorMessage = "Please drop only one file.";
+      return;
+    }
 
-      if (event.dataTransfer.items.length > 1 || !item) {
-        this.showQuantityErrorMessage = true;
-        return;
-      }
-
-      this.showQuantityErrorMessage = false;
-
-      if (item.kind === "file") {
-        const file = item.getAsFile();
-        if (file) {
-          if (this.isEmlFile(file)) {
-          } else {
-            this.showFileErrorMessage = true;
-          }
+    if (item.kind === "file") {
+      const file = item.getAsFile();
+      if (file) {
+        if (this.isEmlFile(file)) {
+          this.emailProcessor.processEmailFile(file);
+        } else {
+          this.errorMessage = "Please drop a .eml file.";
         }
-      }
-    } else {
-      const file = event.dataTransfer.files[0];
-
-      if (event.dataTransfer.files.length > 1 || !file) {
-        this.showQuantityErrorMessage = true;
-        return;
-      }
-
-      this.showQuantityErrorMessage = false;
-
-      if (this.isEmlFile(file)) {
-      } else {
-        this.showFileErrorMessage = true;
       }
     }
   }
 
   handleDragOver(event: DragEvent): void {
     event.preventDefault();
+    this.isHovered = true;
+  }
+
+  handleDragLeave(): void {
+    this.isHovered = false;
   }
 
   isEmlFile(file: File): boolean {
