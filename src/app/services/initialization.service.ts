@@ -13,9 +13,24 @@ export class InitializationService {
   async fetchAndCacheAll(): Promise<void> {
     console.log('Fetching initial data for all lists...');
     await Promise.all([
-      this.fetchAndCache(ApiUrl.DomainBlacklist, ListType.Domain),
-      this.fetchAndCache(ApiUrl.TLDBlacklist, ListType.TLD),
+      this.checkAndFetch(ApiUrl.DomainBlacklist, ListType.Domain),
+      this.checkAndFetch(ApiUrl.TLDBlacklist, ListType.TLD),
     ]);
+  }
+
+  private async checkAndFetch(sourceUrl: string, listName: ListType): Promise<void> {
+    const cacheKey = this.getCacheKey(listName);
+    const cacheTimestampKey = this.getCacheTimestampKey(listName);
+
+    const cachedData = localStorage.getItem(cacheKey);
+    const cachedTimestamp = localStorage.getItem(cacheTimestampKey);
+
+    if (!cachedData || !cachedTimestamp || !this.isCacheValid(listName)) {
+      console.log(`Cache for ${listName} is missing or invalid. Fetching new data...`);
+      await this.fetchAndCache(sourceUrl, listName);
+    } else {
+      console.log(`Cache for ${listName} is valid. Skipping fetch.`);
+    }
   }
 
   async getCachedList(listName: ListType): Promise<string[]> {
@@ -25,7 +40,7 @@ export class InitializationService {
     if (cachedData) {
       return JSON.parse(cachedData);
     } else {
-      console.warn(`Cache for ${listName} not found. Fetching fresh data.`);
+      console.warn(`Cache for ${listName} not found. Fetching new data...`);
       await this.fetchAndCacheByType(listName);
       return JSON.parse(localStorage.getItem(cacheKey) || '[]');
     }
