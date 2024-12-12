@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { HeaderComponent } from './header/header.component';
 import { HomeComponent } from './home/home.component';
 import { FooterComponent } from './footer/footer.component';
-import { InitializationService } from './services/initialization.service';
+import { CacheService } from './services/cache.service';
 
 @Component({
   selector: 'app-root',
@@ -12,11 +12,9 @@ import { InitializationService } from './services/initialization.service';
   styleUrl: './app.component.scss'
 })
 export class AppComponent implements OnInit {
-  constructor(private initService: InitializationService) { }
+  constructor(private cacheService: CacheService) { }
 
   async ngOnInit(): Promise<void> {
-    console.log('Initializing app...');
-    await this.initService.fetchAndCacheAll();
-    console.log('App initialization complete.');
+    await this.cacheService.fetchAndCacheAll();
   }
 }

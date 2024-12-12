@@ -1,85 +1,69 @@
 import { Injectable } from '@angular/core';
 import { BlacklistService } from './blacklist.service';
+import { ExtractedEmailData } from '../shared/enums/interfaces/extracted-email-data.interface';
 
 @Injectable({
   providedIn: 'root'
 })
 export class EmailProcessorService {
-  // TODO: process JS snippets, keywords (PIN, password, etc.), attachments (phishing-report-phishsite.com.pdf)
-  constructor(private blacklistService: BlacklistService) { }
+  constructor(
+    private blacklistService: BlacklistService,
+  ) { }
 
-  // TODO: give user option to process multiple files at once and/or only process certain aspects
-  async processEmailFile(file: File): Promise<void> {
+  async processFile(file: File): Promise<ExtractedEmailData> {
+    // Validate and populate the cache
+    await this.blacklistService.ensureCacheValid();
+
+    // Read and process the file
+    const fileContent = await this.readFileAsText(file);
+    return this.extractEmailData(fileContent);
+  }
+
+  private async readFileAsText(file: File): Promise<string> {
     const reader = new FileReader();
 
-    reader.onload = async (event) => {
-      const fileContent = event.target?.result as string;
-
-      if (!fileContent) {
-        console.error('File is empty or could not be read.');
-        return;
-      }
-
-      // extract subject (scan separately from email body?)
-      const subjectMatch = fileContent.match(/Subject: (.+)/);
-      if (subjectMatch) {
-        console.log('SUBJECT:', subjectMatch[1]);
-      }
-
-      // extract and prepare items to check
-      const senderMatch = fileContent.match(/From:\s*(?:.*<)?([\w.-]+@[\w.-]+)(?:>)?/);
-      const replyToMatch = fileContent.match(/Reply-To:\s*(?:.*<)?([\w.-]+@[\w.-]+)(?:>)?/);
-      const returnPathMatch = fileContent.match(/Return-Path:\s*(?:.*<)?([\w.-]+@[\w.-]+)(?:>)?/);
-      const domainMatches = this.extractDomains(fileContent);
-
-      const itemsToCheck = Array.from(
-        new Set([
-          senderMatch?.[1],
-          replyToMatch?.[1],
-          returnPathMatch?.[1],
-          ...domainMatches,
-        ])
-      )
-        .filter((item): item is string => Boolean(item))
-        .map(item => item.trim().toLowerCase());
-
-      const blacklistResults = await Promise.all(
-        itemsToCheck.map(async (item) => {
-          try {
-            const isBlacklistedDomain = await this.blacklistService.isBlacklistedDomain(item);
-            const tld = item.split('.').pop();
-            const isBlacklistedTLD = tld ? await this.blacklistService.isBlacklistedTLD(tld) : false;
-
-            return { item, isBlacklistedDomain, isBlacklistedTLD };
-          } catch (error) {
-            console.error(`Error checking item "${item}":`, error);
-            return { item, isBlacklistedDomain: false, isBlacklistedTLD: false };
-          }
-        })
-      );
-
-      blacklistResults.forEach(({ item, isBlacklistedDomain, isBlacklistedTLD }) => {
-        if (isBlacklistedDomain && isBlacklistedTLD) {
-          // "EmailAssessmentService"
-          console.log(`"${item}" is blacklisted in both domain and TLD lists.`);
-        } else if (isBlacklistedDomain) {
-          console.log(`"${item}" is blacklisted in the domain list.`);
-        } else if (isBlacklistedTLD) {
-          console.log(`"${item}" has a blacklisted TLD.`);
+    return new Promise((resolve, reject) => {
+      reader.onload = (event) => {
+        const fileContent = event.target?.result as string;
+        if (!fileContent) {
+          reject(new Error('File is empty or could not be read.'));
         } else {
-          console.log(`"${item}" is not blacklisted.`);
+          resolve(fileContent);
         }
-      });
+      };
 
-      console.log(fileContent);
-    };
+      reader.onerror = (error) => {
+        reject(new Error(`Error reading file: ${error}`));
+      };
 
-    reader.onerror = (error) => {
-      console.error('Error reading file:', error);
-    };
-
-    reader.readAsText(file);
+      reader.readAsText(file);
+    });
   }
+
+  private extractEmailData(fileContent: string): ExtractedEmailData {
+    const subjectMatch = fileContent.match(/Subject: (.+)/); // evaluate using keywords / common list?
+    const senderMatch = fileContent.match(/From:\s*(?:.*<)?([\w.-]+@[\w.-]+)(?:>)?/);
+    const replyToMatch = fileContent.match(/Reply-To:\s*(?:.*<)?([\w.-]+@[\w.-]+)(?:>)?/);
+    const returnPathMatch = fileContent.match(/Return-Path:\s*(?:.*<)?([\w.-]+@[\w.-]+)(?:>)?/);
+    const domainMatches = this.extractDomains(fileContent);
+
+    console.log('Extracted Data:', {
+      subject: subjectMatch?.[1] || '',
+      sender: senderMatch?.[1] || '',
+      replyTo: replyToMatch?.[1] || '',
+      returnPath: returnPathMatch?.[1] || '',
+      domains: domainMatches,
+    });
+
+    return {
+      subject: subjectMatch?.[1] || '',
+      sender: senderMatch?.[1] || '',
+      replyTo: replyToMatch?.[1] || '',
+      returnPath: returnPathMatch?.[1] || '',
+      domains: domainMatches,
+    };
+  }
+
 
   private extractDomains(fileContent: string): string[] {
     const cleanedUrlMatches = fileContent

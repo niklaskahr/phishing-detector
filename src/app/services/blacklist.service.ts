@@ -1,22 +1,26 @@
 import { Injectable } from '@angular/core';
-import { InitializationService } from './initialization.service';
+import { CacheService } from './cache.service';
 import { ListType } from '../shared/enums/list-type.enum';
 
 @Injectable({
   providedIn: 'root'
 })
 export class BlacklistService {
+  private domainBlacklist: string[] = [];
+  private tldBlacklist: string[] = [];
 
-  constructor(private initService: InitializationService) { }
+  constructor(private cacheService: CacheService) {}
 
-  async isBlacklistedDomain(domain: string): Promise<boolean> {
-    const domainBlacklist = await this.initService.getCachedList(ListType.Domain);
-    return domainBlacklist.includes(domain.toLowerCase());
+  async ensureCacheValid(): Promise<void> {
+    this.domainBlacklist = await this.cacheService.getCachedList(ListType.Domain);
+    this.tldBlacklist = await this.cacheService.getCachedList(ListType.TLD);
   }
 
-  async isBlacklistedTLD(tld: string): Promise<boolean> {
-    const tldBlacklist = await this.initService.getCachedList(ListType.TLD);
-    return tldBlacklist.includes(tld.toLowerCase());
+  isCachedDomainBlacklisted(domain: string): boolean {
+    return this.domainBlacklist.includes(domain.toLowerCase());
   }
 
+  isCachedTLDBlacklisted(tld: string): boolean {
+    return this.tldBlacklist.includes(tld.toLowerCase());
+  }
 }
