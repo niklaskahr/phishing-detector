@@ -1,14 +1,6 @@
 import { Injectable } from '@angular/core';
-
-export enum ListType {
-  domain = 'domain',
-  TLD = 'tld',
-}
-
-export enum ApiUrl {
-  DomainBlacklist = 'https://raw.githubusercontent.com/phishfort/phishfort-lists/refs/heads/master/blacklists/domains.json',
-  TLDBlacklist = 'https://raw.githubusercontent.com/stamparm/maltrail/refs/heads/master/trails/static/suspicious/domain.txt',
-}
+import { ApiUrl } from '../shared/enums/api-url.enum';
+import { ListType } from '../shared/enums/list-type.enum';
 
 @Injectable({
   providedIn: 'root'
@@ -21,7 +13,7 @@ export class InitializationService {
   async fetchAndCacheAll(): Promise<void> {
     console.log('Fetching initial data for all lists...');
     await Promise.all([
-      this.fetchAndCache(ApiUrl.DomainBlacklist, ListType.domain),
+      this.fetchAndCache(ApiUrl.DomainBlacklist, ListType.Domain),
       this.fetchAndCache(ApiUrl.TLDBlacklist, ListType.TLD),
     ]);
   }
@@ -81,8 +73,8 @@ export class InitializationService {
 
   private async fetchAndCacheByType(listName: ListType): Promise<void> {
     switch (listName) {
-      case ListType.domain:
-        await this.fetchAndCache(ApiUrl.DomainBlacklist, ListType.domain);
+      case ListType.Domain:
+        await this.fetchAndCache(ApiUrl.DomainBlacklist, ListType.Domain);
         break;
       case ListType.TLD:
         await this.fetchAndCache(ApiUrl.TLDBlacklist, ListType.TLD);
