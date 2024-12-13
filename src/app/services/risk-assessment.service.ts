@@ -1,14 +1,19 @@
-import { Injectable } from '@angular/core';
 import { ExtractedData } from '../shared/interfaces/extracted-data.interface';
-import { RiskAssessment } from '../shared/interfaces/risk-assessment.interface';
+import { RiskAssessment, RiskLevel } from '../shared/interfaces/risk-assessment.interface';
+import { BlacklistService } from './blacklist.service';
+import { Injectable } from '@angular/core';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
-export class RiskAssessmentService {
-  blacklistService: any;
+export class RiskAssessmentService { // TODO Class/Service
+
+  constructor(private blacklistService: BlacklistService,) { }
+
+  // TODO: check for attachment (e.g., name, size), keywords in subject/body, email file size
   assessRisk(data: ExtractedData): RiskAssessment {
     let score = 0;
+    let level: RiskLevel = RiskLevel.Low;
 
     // Increase risk score based on suspicious domains or sender
     if (data.sender.endsWith('.xyz') || data.sender.endsWith('.ru')) {
@@ -19,33 +24,17 @@ export class RiskAssessmentService {
       score += 100;
     }
 
+    // Check items against blacklist
+    const blacklistResults = this.checkAgainstBlacklist(data);
+    console.log('Blacklist Results:', blacklistResults);
+
     return {
-      score,
-      isHighRisk: score > 75,
-      warnings: score > 0 ? ['Suspicious sender or domain detected'] : [],
+      riskScore: score,
+      riskLevel: level,
+      isBlacklisted: false,
+      findings: [],
     };
   }
-
-  // // Check items against blacklist
-    // const blacklistResults = this.checkAgainstBlacklist(extractedData);
-    // console.log('Blacklist Results:', blacklistResults);
- 
-  
-  // blacklistResults.forEach(({ item, isBlacklistedDomain, isBlacklistedTLD }) => {
-//     if (isBlacklistedDomain && isBlacklistedTLD) {
-//       // "EmailAssessmentService"
-//       console.log(`"${item}" is blacklisted in both domain and TLD lists.`);
-//     } else if (isBlacklistedDomain) {
-//       console.log(`"${item}" is blacklisted in the domain list.`);
-//     } else if (isBlacklistedTLD) {
-//       console.log(`"${item}" has a blacklisted TLD.`);
-//     } else {
-//       console.log(`"${item}" is not blacklisted.`);
-//     }
-//   });
-
-//   console.log(fileContent);
-// };
 
   private checkAgainstBlacklist(data: ExtractedData) {
     const itemsToCheck = [
@@ -56,12 +45,12 @@ export class RiskAssessmentService {
     ]
       .filter((item): item is string => Boolean(item))
       .map((item) => item.toLowerCase());
-  
+
     return itemsToCheck.map((item) => {
       const isBlacklistedDomain = this.blacklistService.isCachedDomainBlacklisted(item);
       const tld = item.split('.').pop();
       const isBlacklistedTLD = tld ? this.blacklistService.isCachedTLDBlacklisted(tld) : false;
-  
+
       return { item, isBlacklistedDomain, isBlacklistedTLD };
     });
   }

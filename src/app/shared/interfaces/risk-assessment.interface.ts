@@ -1,13 +1,12 @@
-export interface RiskAssessment {
-  score: number;
-  isHighRisk: boolean; // make this a three-state enum or similar (low/medium/high risk)
-  warnings: string[];
+export enum RiskLevel {
+  Low = 'low',
+  Medium = 'medium',
+  High = 'high',
 }
 
-// export interface RiskAssessment {
-//   item: string; // The email, domain, or URL being assessed
-//   riskScore: number; // A numeric score representing the risk level
-//   riskLevel: 'low' | 'medium' | 'high'; // A categorized risk level
-//   blacklisted: boolean; // Whether the item is on a blacklist
-//   findings: string[]; // Detailed findings, e.g., flagged keywords, malicious TLDs
-// }
+export interface RiskAssessment {
+  riskScore: number; // A numeric score representing the risk level
+  riskLevel: RiskLevel;
+  isBlacklisted: boolean; // Whether something within the email is on a blacklist
+  findings: string[]; // Detailed findings, e.g., flagged keywords, malicious TLDs
+}
