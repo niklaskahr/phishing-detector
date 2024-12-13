@@ -6,9 +6,7 @@ import { ExtractedData } from '../shared/interfaces/extracted-data.interface';
   providedIn: 'root'
 })
 export class EmailProcessorService {
-  constructor(
-    private blacklistService: BlacklistService,
-  ) { }
+  constructor(private blacklistService: BlacklistService,) { }
 
   async processFile(file: File): Promise<ExtractedData> {
     // Validate and populate the cache

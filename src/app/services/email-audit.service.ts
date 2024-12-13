@@ -5,6 +5,7 @@ import { StorageService } from './shared/storage.service';
 import { ExtractedData } from '../shared/interfaces/extracted-data.interface';
 import { RiskAssessment } from '../shared/interfaces/risk-assessment.interface';
 import { EventService } from './shared/event.service';
+import { EmailData } from '../shared/interfaces/email-data.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +16,7 @@ export class EmailAuditService {
     private emailProcessorService: EmailProcessorService,
     private riskAssessmentService: RiskAssessmentService,
     private storageService: StorageService
-  ) {    
+  ) {
     this.eventService.fileDropped$.subscribe(file => {
       this.analyzeEmail(file);
     });
@@ -23,21 +24,12 @@ export class EmailAuditService {
 
   async analyzeEmail(file: File): Promise<void> {
     const extractedData: ExtractedData = await this.emailProcessorService.processFile(file);
-    this.storageService.storeExtractedData(extractedData);
+    const riskAssessment: RiskAssessment = this.riskAssessmentService.assessRisk(extractedData);
 
-    console.log("Store Data:", this.storageService.getExtractedData());
+    const data: EmailData = { email: extractedData, assessment: riskAssessment };
+    await this.storageService.storeData(data);
 
-
-    // const riskAssessment = this.riskAssessmentService.assessRisk(extractedData);
-    // this.storageService.storeRiskAssessment(riskAssessment);
-
-    // console.log('Risk Assessment:', riskAssessment);
+    console.log('Stored Data:', this.storageService.getData());
   }
 
-  getStoredResults(): { data: ExtractedData[]; assessments: RiskAssessment[] } {
-    return {
-      data: this.storageService.getExtractedData(),
-      assessments: this.storageService.getRiskAssessments(),
-    };
-  }
 }
