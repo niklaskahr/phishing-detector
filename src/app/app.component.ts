@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { HeaderComponent } from './header/header.component';
 import { HomeComponent } from './home/home.component';
 import { FooterComponent } from './footer/footer.component';
-import { CacheService } from './services/cache.service';
+import { CacheService } from './services/shared/cache.service';
 
 @Component({
   selector: 'app-root',

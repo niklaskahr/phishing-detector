@@ -1,6 +1,7 @@
-<div class="overlay" (drop)="handleDrop($event)" (dragover)="handleDragOver($event)"
-    (dragleave)="handleDragLeave()" [ngClass]="{ 'drag-hover': isHovered }">
+<div class="overlay" (drop)="handleDrop($event)" (dragover)="handleDragOver($event)" (dragleave)="handleDragLeave()"
+    [ngClass]="{ 'drag-hover': isHovered }">
     <span class="file-format">.eml</span>
     <span>Drop your file here.</span>
+    <button>Choose File (TODO)</button>
     <span *ngIf="errorMessage" class="error-message">{{ errorMessage }}</span>
 </div>

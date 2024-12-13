@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { EmailProcessorService } from '../services/email-processor.service';
+import { EventService } from '../services/shared/event.service';
 
 @Component({
   selector: 'app-drop-zone',
@@ -10,10 +11,11 @@ import { EmailProcessorService } from '../services/email-processor.service';
   styleUrl: './drop-zone.component.scss'
 })
 export class DropZoneComponent {
+  @Output() fileDropped = new EventEmitter<File>();
   isHovered: boolean = false;
   errorMessage: string | null = null;
 
-  constructor(private emailProcessor: EmailProcessorService) { }
+  constructor(private eventService: EventService) { }
 
   handleDrop(event: DragEvent): void {
     this.isHovered = false;
@@ -36,7 +38,8 @@ export class DropZoneComponent {
       const file = item.getAsFile();
       if (file) {
         if (this.isEmlFile(file)) {
-          this.emailProcessor.processEmailFile(file);
+          console.log('File emitted to eventService:', file);
+          this.eventService.notifyFileDropped(file);
         } else {
           this.errorMessage = "Please drop a .eml file.";
         }

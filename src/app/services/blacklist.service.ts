@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { CacheService } from './cache.service';
+import { CacheService } from './shared/cache.service';
 import { ListType } from '../shared/enums/list-type.enum';
 
 @Injectable({

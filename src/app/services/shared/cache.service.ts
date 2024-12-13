@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { ApiUrl } from '../shared/enums/api-url.enum';
-import { ListType } from '../shared/enums/list-type.enum';
+import { ApiUrl } from '../../shared/enums/api-url.enum';
+import { ListType } from '../../shared/enums/list-type.enum';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +11,6 @@ export class CacheService {
   private readonly CACHE_VALIDITY_HOURS = 1;
 
   async fetchAndCacheAll(): Promise<void> {
-    console.log('Fetching initial data for all lists...');
     await Promise.all([
       this.checkAndFetch(ApiUrl.DomainBlacklist, ListType.Domain),
       this.checkAndFetch(ApiUrl.TLDBlacklist, ListType.TLD),
@@ -20,24 +19,35 @@ export class CacheService {
 
   async getCachedList(listName: ListType): Promise<string[]> {
     console.log(`Fetching cached data for ${listName}...`);
-    
+
     const cacheKey = this.getCacheKey(listName);
 
     if (this.isCacheValid(listName)) {
       return JSON.parse(localStorage.getItem(cacheKey) || '[]');
     }
 
-    console.info(`Cache for ${listName} is missing or invalid. Fetching fresh data...`);
+    console.info(`Cache for ${listName} is missing or invalid. Fetching data...`);
     await this.fetchAndCacheByType(listName);
     return JSON.parse(localStorage.getItem(cacheKey) || '[]');
   }
 
   private async checkAndFetch(sourceUrl: string, listName: ListType): Promise<void> {
     if (!this.isCacheValid(listName)) {
-      console.info(`Cache for ${listName} is missing or invalid. Fetching new data...`);
+      console.info(`Cache for ${listName} is missing or invalid. Fetching data...`);
       await this.fetchAndCache(sourceUrl, listName);
     } else {
       console.info(`Cache for ${listName} is valid. Skipping fetch.`);
+    }
+  }
+
+  private async fetchAndCacheByType(listName: ListType): Promise<void> {
+    switch (listName) {
+      case ListType.Domain:
+        await this.fetchAndCache(ApiUrl.DomainBlacklist, ListType.Domain);
+        break;
+      case ListType.TLD:
+        await this.fetchAndCache(ApiUrl.TLDBlacklist, ListType.TLD);
+        break;
     }
   }
 
@@ -82,18 +92,6 @@ export class CacheService {
 
     const cacheAge = (Date.now() - parseInt(cachedTimestamp, 10)) / (1000 * 60 * 60);
     return cacheAge < this.CACHE_VALIDITY_HOURS;
-  }
-
-
-  private async fetchAndCacheByType(listName: ListType): Promise<void> {
-    switch (listName) {
-      case ListType.Domain:
-        await this.fetchAndCache(ApiUrl.DomainBlacklist, ListType.Domain);
-        break;
-      case ListType.TLD:
-        await this.fetchAndCache(ApiUrl.TLDBlacklist, ListType.TLD);
-        break;
-    }
   }
 
   private getCacheKey(listName: ListType): string {
