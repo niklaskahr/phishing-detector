@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BlacklistService } from './blacklist.service';
-import { ExtractedEmailData } from '../shared/enums/interfaces/extracted-email-data.interface';
+import { ExtractedEmailData } from '../shared/interfaces/extracted-email-data.interface';
 
 @Injectable({
   providedIn: 'root'
