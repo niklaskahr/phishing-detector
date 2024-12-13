@@ -38,7 +38,6 @@ export class DropZoneComponent {
       const file = item.getAsFile();
       if (file) {
         if (this.isEmlFile(file)) {
-          console.log('File emitted to eventService:', file);
           this.eventService.notifyFileDropped(file);
         } else {
           this.errorMessage = "Please drop a .eml file.";

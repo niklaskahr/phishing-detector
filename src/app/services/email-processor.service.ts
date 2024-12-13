@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BlacklistService } from './blacklist.service';
-import { ExtractedEmailData } from '../shared/interfaces/extracted-email-data.interface';
+import { ExtractedData } from '../shared/interfaces/extracted-data.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +10,7 @@ export class EmailProcessorService {
     private blacklistService: BlacklistService,
   ) { }
 
-  async processFile(file: File): Promise<ExtractedEmailData> {
+  async processFile(file: File): Promise<ExtractedData> {
     // Validate and populate the cache
     await this.blacklistService.ensureCacheValid();
 
@@ -40,7 +40,7 @@ export class EmailProcessorService {
     });
   }
 
-  private extractEmailData(fileContent: string): ExtractedEmailData {
+  private extractEmailData(fileContent: string): ExtractedData {
     const subjectMatch = fileContent.match(/Subject: (.+)/); // evaluate using keywords / common list?
     const senderMatch = fileContent.match(/From:\s*(?:.*<)?([\w.-]+@[\w.-]+)(?:>)?/);
     const replyToMatch = fileContent.match(/Reply-To:\s*(?:.*<)?([\w.-]+@[\w.-]+)(?:>)?/);

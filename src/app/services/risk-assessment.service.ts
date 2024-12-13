@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ExtractedEmailData } from '../shared/interfaces/extracted-email-data.interface';
+import { ExtractedData } from '../shared/interfaces/extracted-data.interface';
 import { RiskAssessment } from '../shared/interfaces/risk-assessment.interface';
 
 @Injectable({
@@ -7,7 +7,7 @@ import { RiskAssessment } from '../shared/interfaces/risk-assessment.interface';
 })
 export class RiskAssessmentService {
   blacklistService: any;
-  assessRisk(data: ExtractedEmailData): RiskAssessment {
+  assessRisk(data: ExtractedData): RiskAssessment {
     let score = 0;
 
     // Increase risk score based on suspicious domains or sender
@@ -47,7 +47,7 @@ export class RiskAssessmentService {
 //   console.log(fileContent);
 // };
 
-  private checkAgainstBlacklist(data: ExtractedEmailData) {
+  private checkAgainstBlacklist(data: ExtractedData) {
     const itemsToCheck = [
       data.sender,
       data.replyTo,
