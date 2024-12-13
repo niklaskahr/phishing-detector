@@ -1,16 +1,17 @@
-import * as crypto from 'crypto';
-
 export class HashingUtility {
-    static generateHash<T extends object>(data: T): string {
-        // Extract all keys from the object
-        const keys = Object.keys(data) as (keyof T)[];
+  static async generateHash(data: object): Promise<string> {
+    const keys = Object.keys(data);
+    const uniqueString = keys  // use only the values
+      .map((key) => JSON.stringify((data as any)[key]) || '')
+      .join('|');
 
-        // Construct a unique string using only the values
-        const uniqueString = keys
-            .map((key) => JSON.stringify(data[key]) || '') // Use only the values
-            .join('|'); // Combine values with a separator
+    const encoder = new TextEncoder();
+    const encodedData = encoder.encode(uniqueString);
 
-        // Generate and return the hash
-        return crypto.createHash('sha256').update(uniqueString).digest('hex');
-    }
+    const hashBuffer = await window.crypto.subtle.digest('SHA-256', encodedData);
+
+    return Array.from(new Uint8Array(hashBuffer))
+      .map((byte) => byte.toString(16).padStart(2, '0'))
+      .join('');
+  }
 }
