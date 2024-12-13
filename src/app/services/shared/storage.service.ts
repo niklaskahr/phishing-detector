@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { ExtractedEmailData } from '../shared/enums/interfaces/extracted-email-data.interface';
-import { RiskAssessment } from '../shared/enums/interfaces/risk-assessment.interface';
+import { ExtractedEmailData } from '../../shared/interfaces/extracted-email-data.interface';
+import { RiskAssessment } from '../../shared/interfaces/risk-assessment.interface';
 
 @Injectable({
   providedIn: 'root'
