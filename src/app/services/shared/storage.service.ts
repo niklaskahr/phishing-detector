@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HashingUtility } from '../../shared/utils/hashing-utility.utility';
 import { EmailData } from '../../shared/interfaces/email-data.interface';
+import { LoaderService } from './loader.service';
 
 @Injectable({
   providedIn: 'root'
@@ -8,6 +9,8 @@ import { EmailData } from '../../shared/interfaces/email-data.interface';
 export class StorageService {
   private emailHashes: Set<string> = new Set();
   private dataStore: Map<string, EmailData> = new Map(); // also store raw email body in EmailData?
+
+  constructor(private loaderService: LoaderService) { }
 
   async storeData(data: EmailData): Promise<void> {
     const hash = await HashingUtility.generateHash(data.email);
@@ -18,6 +21,7 @@ export class StorageService {
     } else {
       ///console.warn('Duplicate data detected. Skipping storage.', data);
     }
+    this.loaderService.hide();
   }
 
   getData(): EmailData[] {

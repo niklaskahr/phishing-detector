@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ApiUrl } from '../../shared/enums/api-url.enum';
 import { ListType } from '../../shared/enums/list-type.enum';
+import { LoaderService } from './loader.service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,11 +11,14 @@ export class CacheService {
   private readonly CACHE_TIMESTAMP_PREFIX = 'blacklist_timestamp_';
   private readonly CACHE_VALIDITY_HOURS = 1;
 
+  constructor(private loaderService: LoaderService) { }
+
   async fetchAndCacheAll(): Promise<void> {
     await Promise.all([
       this.checkAndFetch(ApiUrl.DomainBlacklist, ListType.Domain),
       this.checkAndFetch(ApiUrl.TLDBlacklist, ListType.TLD),
     ]);
+    this.loaderService.hide();
   }
 
   async getCachedList(listName: ListType): Promise<string[]> {
@@ -24,6 +28,8 @@ export class CacheService {
       return JSON.parse(localStorage.getItem(cacheKey) || '[]');
     }
 
+    this.loaderService.show();
+
     console.info(`Cache for ${listName} is missing or invalid. Fetching data...`);
     await this.fetchAndCacheByType(listName);
     return JSON.parse(localStorage.getItem(cacheKey) || '[]');
@@ -31,6 +37,7 @@ export class CacheService {
 
   private async checkAndFetch(sourceUrl: string, listName: ListType): Promise<void> {
     if (!this.isCacheValid(listName)) {
+      this.loaderService.show();
       console.info(`Cache for ${listName} is missing or invalid. Fetching data...`);
       await this.fetchAndCache(sourceUrl, listName);
     } else {

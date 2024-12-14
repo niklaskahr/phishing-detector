@@ -1,14 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { HeaderComponent } from './header/header.component';
 import { HomeComponent } from './home/home.component';
+import { LoaderComponent } from './loader/loader.component';
 import { FooterComponent } from './footer/footer.component';
-import { CacheService } from './services/shared/cache.service';
 import { EmailAuditService } from './services/email-audit.service';
+import { CacheService } from './services/shared/cache.service';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [HeaderComponent, HomeComponent, FooterComponent],
+  imports: [HeaderComponent, HomeComponent, LoaderComponent, FooterComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })

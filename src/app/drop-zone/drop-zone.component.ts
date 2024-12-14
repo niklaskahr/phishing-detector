@@ -1,6 +1,5 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { EmailProcessorService } from '../services/email-processor.service';
 import { EventService } from '../services/shared/event.service';
 
 @Component({
@@ -11,7 +10,6 @@ import { EventService } from '../services/shared/event.service';
   styleUrl: './drop-zone.component.scss'
 })
 export class DropZoneComponent {
-  @Output() fileDropped = new EventEmitter<File>();
   isHovered: boolean = false;
   errorMessage: string | null = null;
 

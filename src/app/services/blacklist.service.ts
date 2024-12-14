@@ -9,7 +9,7 @@ export class BlacklistService {
   private domainBlacklist: string[] = [];
   private tldBlacklist: string[] = [];
 
-  constructor(private cacheService: CacheService) {}
+  constructor(private cacheService: CacheService) { }
 
   async ensureCacheValid(): Promise<void> {
     this.domainBlacklist = await this.cacheService.getCachedList(ListType.Domain);
