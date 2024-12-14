@@ -7,15 +7,19 @@ import { PHISHING_KEYWORDS } from '../shared/constants/phishing-keywords.constan
   providedIn: 'root'
 })
 export class EmailProcessorService {
+  fileSize: number = 0;
+
   constructor(private blacklistService: BlacklistService,) { }
 
   async processFile(file: File): Promise<ExtractedData> {
-    await this.blacklistService.ensureCacheValid(); // calidate and populate the cache
+    await this.blacklistService.ensureCacheValid(); // validate and populate the cache
     const fileContent = await this.readFileAsText(file);
     return this.extractEmailData(fileContent);
   }
 
   private async readFileAsText(file: File): Promise<string> {
+    this.fileSize = file.size;
+
     const reader = new FileReader();
 
     return new Promise((resolve, reject) => {
@@ -39,7 +43,7 @@ export class EmailProcessorService {
   private extractEmailData(fileContent: string): ExtractedData {
     const headersAndBody = fileContent.split(/\r?\n\r?\n/);
     const rawHeaders = headersAndBody[0] || '';
-    const rawEmail = headersAndBody.slice(1).join('\n'); // Join remaining parts to handle multiple blank lines
+    const rawEmail = headersAndBody.slice(1).join('\n'); // join remaining parts to handle multiple blank lines
 
     const senderMatch = rawHeaders.match(/^From:\s*(?:.*<)?([\w.-]+@[\w.-]+)(?:>)?/m);
     const replyToMatch = rawHeaders.match(/^Reply-To:\s*(?:.*<)?([\w.-]+@[\w.-]+)(?:>)?/m);
@@ -59,6 +63,7 @@ export class EmailProcessorService {
       rawEmail: rawEmail || '',
       detectedJavaScript: detectedJavaScript,
       detectedPhishingKeywords: detectedPhishingKeywords,
+      fileSize: this.fileSize,
     });
 
     return {
@@ -70,6 +75,7 @@ export class EmailProcessorService {
       rawEmail: rawEmail || '',
       detectedJavaScript: detectedJavaScript,
       detectedPhishingKeywords: detectedPhishingKeywords,
+      fileSize: this.fileSize,
     };
   }
 

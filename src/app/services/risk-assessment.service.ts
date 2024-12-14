@@ -6,16 +6,14 @@ import { Injectable } from '@angular/core';
 @Injectable({
   providedIn: 'root',
 })
-export class RiskAssessmentService { // TODO Class/Service
-
+export class RiskAssessmentService {
   constructor(private blacklistService: BlacklistService,) { }
 
-  // TODO: check for attachment (e.g., name, size), keywords in subject/body, email file size
   assessRisk(data: ExtractedData): RiskAssessment {
     let score = 0;
     let level: RiskLevel = RiskLevel.Low;
 
-    // Increase risk score based on suspicious domains or sender
+    // increase risk score based on suspicious domains or sender
     if (data.sender.endsWith('.xyz') || data.sender.endsWith('.ru')) {
       score += 50;
     }
@@ -24,9 +22,10 @@ export class RiskAssessmentService { // TODO Class/Service
       score += 100;
     }
 
-    // Check items against blacklist
+    // check items against blacklist
     const blacklistResults = this.checkAgainstBlacklist(data);
-    console.log('Blacklist Results:', blacklistResults);
+
+    // fileSize: emails < 5 KB or > 50 KB are worth a closer look
 
     return {
       riskScore: score,

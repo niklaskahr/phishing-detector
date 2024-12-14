@@ -7,4 +7,5 @@ export interface ExtractedData {
   rawEmail: string;
   detectedJavaScript: string[];
   detectedPhishingKeywords: string[];
+  fileSize: number;
 }
