@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BlacklistService } from './blacklist.service';
 import { ExtractedData } from '../shared/interfaces/extracted-data.interface';
+import { PHISHING_KEYWORDS } from '../shared/constants/phishing-keywords.constant';
 
 @Injectable({
   providedIn: 'root'
@@ -9,10 +10,7 @@ export class EmailProcessorService {
   constructor(private blacklistService: BlacklistService,) { }
 
   async processFile(file: File): Promise<ExtractedData> {
-    // Validate and populate the cache
-    await this.blacklistService.ensureCacheValid();
-
-    // Read and process the file
+    await this.blacklistService.ensureCacheValid(); // calidate and populate the cache
     const fileContent = await this.readFileAsText(file);
     return this.extractEmailData(fileContent);
   }
@@ -39,31 +37,44 @@ export class EmailProcessorService {
   }
 
   private extractEmailData(fileContent: string): ExtractedData {
-    const subjectMatch = fileContent.match(/Subject: (.+)/); // evaluate using keywords / common list?
-    const senderMatch = fileContent.match(/From:\s*(?:.*<)?([\w.-]+@[\w.-]+)(?:>)?/);
-    const replyToMatch = fileContent.match(/Reply-To:\s*(?:.*<)?([\w.-]+@[\w.-]+)(?:>)?/);
-    const returnPathMatch = fileContent.match(/Return-Path:\s*(?:.*<)?([\w.-]+@[\w.-]+)(?:>)?/);
-    const domainMatches = this.extractDomains(fileContent);
+    const headersAndBody = fileContent.split(/\r?\n\r?\n/);
+    const rawHeaders = headersAndBody[0] || '';
+    const rawEmail = headersAndBody.slice(1).join('\n'); // Join remaining parts to handle multiple blank lines
+
+    const senderMatch = rawHeaders.match(/^From:\s*(?:.*<)?([\w.-]+@[\w.-]+)(?:>)?/m);
+    const replyToMatch = rawHeaders.match(/^Reply-To:\s*(?:.*<)?([\w.-]+@[\w.-]+)(?:>)?/m);
+    const returnPathMatch = rawHeaders.match(/^Return-Path:\s*(?:.*<)?([\w.-]+@[\w.-]+)(?:>)?/m);
+    const subjectMatch = rawHeaders.match(/^Subject:\s*(.+)/m);
+    const domainMatches = this.detectDomains(fileContent);
+
+    const detectedJavaScript = this.detectJavaScript(fileContent);
+    const detectedPhishingKeywords = this.detectPhishingKeywords(fileContent);
 
     console.log('Extracted Data:', {
-      subject: subjectMatch?.[1] || '',
       sender: senderMatch?.[1] || '',
       replyTo: replyToMatch?.[1] || '',
       returnPath: returnPathMatch?.[1] || '',
       domains: domainMatches,
+      subject: subjectMatch?.[1] || '',
+      rawEmail: rawEmail || '',
+      detectedJavaScript: detectedJavaScript,
+      detectedPhishingKeywords: detectedPhishingKeywords,
     });
 
     return {
-      subject: subjectMatch?.[1] || '',
       sender: senderMatch?.[1] || '',
       replyTo: replyToMatch?.[1] || '',
       returnPath: returnPathMatch?.[1] || '',
       domains: domainMatches,
+      subject: subjectMatch?.[1] || '',
+      rawEmail: rawEmail || '',
+      detectedJavaScript: detectedJavaScript,
+      detectedPhishingKeywords: detectedPhishingKeywords,
     };
   }
 
 
-  private extractDomains(fileContent: string): string[] {
+  private detectDomains(fileContent: string): string[] {
     const cleanedUrlMatches = fileContent
       .match(/https?:\/\/[^\s"<>]+/g)
       ?.map(url =>
@@ -84,5 +95,27 @@ export class EmailProcessorService {
           .filter((hostname): hostname is string => Boolean(hostname)) // type guard for non-null strings
       ),
     ];
+  }
+
+  private detectJavaScript(content: string): string[] {
+    const executionPatterns: { pattern: RegExp; label: string }[] = [
+      { pattern: /<script[\s\S]*?>[\s\S]*?<\/script>/i, label: '<script> tag' },
+      { pattern: /<[^>]+on\w+\s*=\s*["']?[^"'>]*["']?/i, label: 'Inline event handler' },
+      { pattern: /javascript:/i, label: 'JavaScript URL' },
+      { pattern: /eval\(/i, label: 'eval() function' },
+      { pattern: /new Function\(/i, label: 'new Function()' },
+      { pattern: /document\.write\(/i, label: 'document.write()' },
+      { pattern: /window\.location/i, label: 'window.location manipulation' },
+      { pattern: /<iframe[\s\S]*?>/i, label: '<iframe> tag' }
+    ];
+
+    return executionPatterns
+      .filter(({ pattern }) => pattern.test(content))
+      .map(({ label }) => label);
+  }
+
+  private detectPhishingKeywords(content: string): string[] {
+    const lowerCasedContent = content.toLowerCase();
+    return PHISHING_KEYWORDS.filter(keyword => lowerCasedContent.includes(keyword.toLowerCase()));
   }
 }

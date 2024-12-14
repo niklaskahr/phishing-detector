@@ -9,7 +9,6 @@ export class EventService {
   fileDropped$ = this.fileDroppedSubject.asObservable();
 
   notifyFileDropped(file: File): void {
-    console.log('eventService received file:', file);
     this.fileDroppedSubject.next(file);
   }
 }

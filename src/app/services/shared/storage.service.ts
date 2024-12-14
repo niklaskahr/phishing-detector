@@ -6,18 +6,17 @@ import { EmailData } from '../../shared/interfaces/email-data.interface';
   providedIn: 'root'
 })
 export class StorageService {
-  private dataHashes: Set<string> = new Set();
-  private dataStore: Map<string, EmailData> = new Map();
+  private emailHashes: Set<string> = new Set();
+  private dataStore: Map<string, EmailData> = new Map(); // also store raw email body in EmailData?
 
   async storeData(data: EmailData): Promise<void> {
-    const hash = await HashingUtility.generateHash(data);
+    const hash = await HashingUtility.generateHash(data.email);
 
-    if (!this.dataHashes.has(hash)) {
-      this.dataHashes.add(hash);
+    if (!this.emailHashes.has(hash)) {
+      this.emailHashes.add(hash);
       this.dataStore.set(hash, data);
-      console.log('Stored combined data:', data);
     } else {
-      console.warn('Duplicate combined data detected. Skipping storage.', data);
+      ///console.warn('Duplicate data detected. Skipping storage.', data);
     }
   }
 

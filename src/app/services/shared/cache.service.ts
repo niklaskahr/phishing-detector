@@ -18,8 +18,6 @@ export class CacheService {
   }
 
   async getCachedList(listName: ListType): Promise<string[]> {
-    console.log(`Fetching cached data for ${listName}...`);
-
     const cacheKey = this.getCacheKey(listName);
 
     if (this.isCacheValid(listName)) {

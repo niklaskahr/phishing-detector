@@ -1,7 +1,10 @@
 export interface ExtractedData {
-    subject: string;
-    sender: string;
-    replyTo: string;
-    returnPath: string;
-    domains: string[];
-  }
+  sender: string;
+  replyTo: string;
+  returnPath: string;
+  domains: string[];
+  subject: string;
+  rawEmail: string;
+  detectedJavaScript: string[];
+  detectedPhishingKeywords: string[];
+}
