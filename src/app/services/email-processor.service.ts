@@ -3,13 +3,12 @@ import { ExtractedData } from '../shared/interfaces/extracted-data.interface';
 import { PHISHING_KEYWORDS } from '../shared/constants/phishing-keywords.constant';
 import { AttachmentDetails } from '../shared/interfaces/attachment-details.interface';
 import { UNSAFE_FILE_EXTENSIONS } from '../shared/constants/unsafe-file-extensions.constant';
-import { FileReaderUtil } from '../shared/utils/file-reader.util.util';
+import { FileReaderUtil } from '../shared/utils/file-reader.util';
 
 @Injectable({
   providedIn: 'root'
 })
 export class EmailProcessorService {
-  private fileReaderUtil = new FileReaderUtil();
   fileSize: number = 0;
 
   // async processFile(file: File): Promise<ExtractedData> {
@@ -42,7 +41,7 @@ export class EmailProcessorService {
   // }
 
   async processFile(file: File): Promise<ExtractedData> {
-    const fileContent = await this.fileReaderUtil.readFileAsText(file);
+    const fileContent = await FileReaderUtil.readFileAsText(file);
     this.fileSize = file.size;
     return this.extractEmailData(fileContent);
   }

@@ -1,7 +1,7 @@
 import { ExtractedData } from "./extracted-data.interface";
-import { RiskAssessment } from "./risk-assessment.interface";
+import { Assessment } from "./assessment.interface";
 
 export interface EmailData {
     email: ExtractedData;
-    assessment: RiskAssessment;
+    assessment: Assessment;
 }

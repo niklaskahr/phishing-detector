@@ -1,5 +1,5 @@
 export class FileReaderUtil {
-    async readFileAsText(file: File): Promise<string> {
+    static async readFileAsText(file: File): Promise<string> {
         const reader = new FileReader();
 
         return new Promise((resolve, reject) => {
