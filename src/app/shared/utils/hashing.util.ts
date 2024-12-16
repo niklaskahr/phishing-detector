@@ -1,4 +1,4 @@
-export class HashingUtility {
+export class HashingUtil {
   static async generateHash(data: object): Promise<string> {
     const keys = Object.keys(data);
     const uniqueString = keys  // use only the values

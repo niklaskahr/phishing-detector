@@ -1,51 +1,56 @@
 import { Injectable } from '@angular/core';
-import { BlacklistService } from './blacklist.service';
 import { ExtractedData } from '../shared/interfaces/extracted-data.interface';
 import { PHISHING_KEYWORDS } from '../shared/constants/phishing-keywords.constant';
 import { AttachmentDetails } from '../shared/interfaces/attachment-details.interface';
 import { UNSAFE_FILE_EXTENSIONS } from '../shared/constants/unsafe-file-extensions.constant';
+import { FileReaderUtil } from '../shared/utils/file-reader.util.util';
 
 @Injectable({
   providedIn: 'root'
 })
 export class EmailProcessorService {
+  private fileReaderUtil = new FileReaderUtil();
   fileSize: number = 0;
 
-  constructor(private blacklistService: BlacklistService,) { }
+  // async processFile(file: File): Promise<ExtractedData> {
+  //   await this.blacklistService.ensureCacheValid(); // validate and populate the cache
+  //   const fileContent = await this.readFileAsText(file);
+  //   return this.extractEmailData(fileContent);
+  // }
+
+  // private async readFileAsText(file: File): Promise<string> {
+  //   this.fileSize = file.size;
+
+  //   const reader = new FileReader();
+
+  //   return new Promise((resolve, reject) => {
+  //     reader.onload = (event) => {
+  //       const fileContent = event.target?.result as string;
+  //       if (!fileContent) {
+  //         reject(new Error('File is empty or could not be read.'));
+  //       } else {
+  //         resolve(fileContent);
+  //       }
+  //     };
+
+  //     reader.onerror = (error) => {
+  //       reject(new Error(`Error reading file: ${error}`));
+  //     };
+
+  //     reader.readAsText(file);
+  //   });
+  // }
 
   async processFile(file: File): Promise<ExtractedData> {
-    await this.blacklistService.ensureCacheValid(); // validate and populate the cache
-    const fileContent = await this.readFileAsText(file);
-    return this.extractEmailData(fileContent);
-  }
-
-  private async readFileAsText(file: File): Promise<string> {
+    const fileContent = await this.fileReaderUtil.readFileAsText(file);
     this.fileSize = file.size;
-
-    const reader = new FileReader();
-
-    return new Promise((resolve, reject) => {
-      reader.onload = (event) => {
-        const fileContent = event.target?.result as string;
-        if (!fileContent) {
-          reject(new Error('File is empty or could not be read.'));
-        } else {
-          resolve(fileContent);
-        }
-      };
-
-      reader.onerror = (error) => {
-        reject(new Error(`Error reading file: ${error}`));
-      };
-
-      reader.readAsText(file);
-    });
+    return this.extractEmailData(fileContent);
   }
 
   private extractEmailData(fileContent: string): ExtractedData {
     const headersAndBody = fileContent.split(/\r?\n\r?\n/);
     const rawHeaders = headersAndBody[0] || '';
-    const rawEmail = headersAndBody.slice(1).join('\n'); // join remaining parts to handle multiple blank lines
+    const rawEmail = headersAndBody.slice(1).join('\n'); // handle multiple blank lines
 
     const senderMatch = rawHeaders.match(/^From:\s*(?:.*<)?([\w.-]+@[\w.-]+)(?:>)?/m);
     const replyToMatch = rawHeaders.match(/^Reply-To:\s*(?:.*<)?([\w.-]+@[\w.-]+)(?:>)?/m);
