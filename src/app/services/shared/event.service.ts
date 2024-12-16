@@ -5,10 +5,10 @@ import { Subject } from 'rxjs';
   providedIn: 'root'
 })
 export class EventService {
-  private fileDroppedSubject = new Subject<File>();
-  fileDropped$ = this.fileDroppedSubject.asObservable();
+  private filesDroppedSubject = new Subject<File[]>();
+  filesDropped$ = this.filesDroppedSubject.asObservable();
 
-  notifyFileDropped(file: File): void {
-    this.fileDroppedSubject.next(file);
+  notifyFilesDropped(files: File[]): void {
+    this.filesDroppedSubject.next(files);
   }
 }

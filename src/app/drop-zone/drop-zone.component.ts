@@ -25,22 +25,35 @@ export class DropZoneComponent {
     }
 
     event.preventDefault(); // prevent file from being opened
-    const item = event.dataTransfer.items[0];
+    const files: File[] = [];
 
-    if (event.dataTransfer.items.length > 1 || !item) {
-      this.errorMessage = "Please drop only one file.";
-      return;
-    }
-
-    if (item.kind === "file") {
-      const file = item.getAsFile();
-      if (file) {
-        if (this.isEmlFile(file)) {
-          this.eventService.notifyFileDropped(file);
-        } else {
-          this.errorMessage = "Please drop a .eml file.";
+    if (event.dataTransfer.items) {
+      for (let i = 0; i < event.dataTransfer.items.length; i++) {
+        const item = event.dataTransfer.items[i];
+        if (item.kind === "file") {
+          const file = item.getAsFile();
+          if (file && this.isEmlFile(file)) {
+            files.push(file);
+          } else if (file && !this.isEmlFile(file)) {
+            this.errorMessage = "One or more files are not .eml files.";
+          }
         }
       }
+    } else if (event.dataTransfer.files) {
+      for (let i = 0; i < event.dataTransfer.files.length; i++) {
+        const file = event.dataTransfer.files[i];
+        if (this.isEmlFile(file)) {
+          files.push(file);
+        } else {
+          this.errorMessage = "One or more files are not .eml files.";
+        }
+      }
+    }
+
+    if (files.length > 0) {
+      this.eventService.notifyFilesDropped(files);
+    } else if (!this.errorMessage) {
+      this.errorMessage = "No valid .eml files were dropped.";
     }
   }
 

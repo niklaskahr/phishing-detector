@@ -17,7 +17,9 @@ export class EmailAuditService {
     private riskAssessmentService: AssessmentService,
     private storageService: StorageService
   ) {
-    this.eventService.fileDropped$.subscribe(file => { this.analyzeEmail(file); });
+    this.eventService.filesDropped$.subscribe(files => {
+      files.forEach(file => this.analyzeEmail(file));
+    });
   }
 
   async analyzeEmail(file: File): Promise<void> {
