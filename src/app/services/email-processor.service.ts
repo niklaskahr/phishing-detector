@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { BlacklistService } from './blacklist.service';
 import { ExtractedData } from '../shared/interfaces/extracted-data.interface';
 import { PHISHING_KEYWORDS } from '../shared/constants/phishing-keywords.constant';
+import { AttachmentDetails } from '../shared/interfaces/attachment-details.interface';
+import { UNSAFE_FILE_EXTENSIONS } from '../shared/constants/unsafe-file-extensions.constant';
 
 @Injectable({
   providedIn: 'root'
@@ -51,20 +53,9 @@ export class EmailProcessorService {
     const subjectMatch = rawHeaders.match(/^Subject:\s*(.+)/m);
     const domainMatches = this.detectDomains(fileContent);
 
-    const detectedJavaScript = this.detectJavaScript(fileContent);
-    const detectedPhishingKeywords = this.detectPhishingKeywords(fileContent);
-
-    console.log('Extracted Data:', {
-      sender: senderMatch?.[1] || '',
-      replyTo: replyToMatch?.[1] || '',
-      returnPath: returnPathMatch?.[1] || '',
-      domains: domainMatches,
-      subject: subjectMatch?.[1] || '',
-      rawEmail: rawEmail || '',
-      detectedJavaScript: detectedJavaScript,
-      detectedPhishingKeywords: detectedPhishingKeywords,
-      fileSize: this.fileSize,
-    });
+    const detectedJavaScript = this.detectJavaScript(rawEmail);
+    const detectedPhishingKeywords = this.detectPhishingKeywords(`${subjectMatch?.[1]}\n${rawEmail}`);
+    const unsafeAttachments = this.extractUnsafeAttachments(fileContent);
 
     return {
       sender: senderMatch?.[1] || '',
@@ -76,6 +67,7 @@ export class EmailProcessorService {
       detectedJavaScript: detectedJavaScript,
       detectedPhishingKeywords: detectedPhishingKeywords,
       fileSize: this.fileSize,
+      attachments: unsafeAttachments,
     };
   }
 
@@ -103,7 +95,7 @@ export class EmailProcessorService {
     ];
   }
 
-  private detectJavaScript(content: string): string[] {
+  private detectJavaScript(email: string): string[] {
     const executionPatterns: { pattern: RegExp; label: string }[] = [
       { pattern: /<script[\s\S]*?>[\s\S]*?<\/script>/i, label: '<script> tag' },
       { pattern: /<[^>]+on\w+\s*=\s*["']?[^"'>]*["']?/i, label: 'Inline event handler' },
@@ -116,12 +108,50 @@ export class EmailProcessorService {
     ];
 
     return executionPatterns
-      .filter(({ pattern }) => pattern.test(content))
+      .filter(({ pattern }) => pattern.test(email))
       .map(({ label }) => label);
   }
 
-  private detectPhishingKeywords(content: string): string[] {
-    const lowerCasedContent = content.toLowerCase();
-    return PHISHING_KEYWORDS.filter(keyword => lowerCasedContent.includes(keyword.toLowerCase()));
+  private detectPhishingKeywords(subjectAndEmail: string): string[] {
+    const lowerCasedContent = subjectAndEmail.toLowerCase();
+    return PHISHING_KEYWORDS.filter(keyword => {
+      const regex = new RegExp(`\\b${keyword.toLowerCase()}\\b`, 'g');
+      return regex.test(lowerCasedContent);
+    });
+  }
+
+  private extractUnsafeAttachments(fileContent: string): AttachmentDetails[] | null {
+    const unsafeExtensions = UNSAFE_FILE_EXTENSIONS;
+    const attachments: AttachmentDetails[] = [];
+    const processedFilenames = new Set<string>();
+
+    // pre-process: merge multi-line headers
+    const mergedContent = fileContent.replace(/\r?\n\s+/g, ' ');
+
+    const contentTypeRegex = /Content-Type:.*?;\s*name="?([^";\r\n\s]+)"?/gi;
+    const contentDispositionRegex = /Content-Disposition:.*?;\s*filename="?([^";\r\n\s]+)"?/gi;
+
+    let match: RegExpExecArray | null;
+
+    const processMatch = (filename: string) => { // extract and process filenames
+      const fileParts = filename.split('.');
+      const fileType = fileParts.pop()?.toLowerCase(); // extract extension
+      const baseName = fileParts.join('.'); // remaining part is the file name without extension
+
+      if (fileType && unsafeExtensions.includes(fileType) && !processedFilenames.has(filename)) {
+        attachments.push({ name: baseName, type: fileType });
+        processedFilenames.add(filename);
+      }
+    };
+
+    while ((match = contentTypeRegex.exec(mergedContent))) { // search for Content-Type matches
+      processMatch(match[1]);
+    }
+
+    while ((match = contentDispositionRegex.exec(mergedContent))) { // search for Content-Disposition matches
+      processMatch(match[1]);
+    }
+
+    return attachments.length > 0 ? attachments : null;
   }
 }

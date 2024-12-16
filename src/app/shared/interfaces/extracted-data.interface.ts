@@ -1,3 +1,5 @@
+import { AttachmentDetails } from "./attachment-details.interface";
+
 export interface ExtractedData {
   sender: string;
   replyTo: string;
@@ -8,4 +10,5 @@ export interface ExtractedData {
   detectedJavaScript: string[];
   detectedPhishingKeywords: string[];
   fileSize: number;
+  attachments: AttachmentDetails[] | null;
 }
