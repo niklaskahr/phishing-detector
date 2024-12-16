@@ -9,7 +9,9 @@ import { Injectable } from '@angular/core';
 export class RiskAssessmentService {
   constructor(private blacklistService: BlacklistService,) { }
 
-  assessRisk(data: ExtractedData): RiskAssessment {
+  async assessRisk(data: ExtractedData): Promise<RiskAssessment> {
+    await this.blacklistService.ensureCacheValid(); // validate and populate the cache
+
     let score = 0;
     let level: RiskLevel = RiskLevel.Low;
 

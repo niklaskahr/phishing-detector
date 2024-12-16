@@ -17,19 +17,16 @@ export class EmailAuditService {
     private riskAssessmentService: RiskAssessmentService,
     private storageService: StorageService
   ) {
-    this.eventService.fileDropped$.subscribe(file => {
-      this.analyzeEmail(file);
-    });
+    this.eventService.fileDropped$.subscribe(file => { this.analyzeEmail(file); });
   }
 
   async analyzeEmail(file: File): Promise<void> {
     const extractedData: ExtractedData = await this.emailProcessorService.processFile(file);
-    const riskAssessment: RiskAssessment = this.riskAssessmentService.assessRisk(extractedData);
+    const riskAssessment: RiskAssessment = await this.riskAssessmentService.assessRisk(extractedData);
 
     const data: EmailData = { email: extractedData, assessment: riskAssessment };
     await this.storageService.storeData(data);
 
     console.log('Stored Data:', this.storageService.getData());
   }
-
 }
