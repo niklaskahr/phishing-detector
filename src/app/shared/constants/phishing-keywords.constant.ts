@@ -103,6 +103,7 @@ export const PHISHING_KEYWORDS: string[] = [
     'direct email',
     'direct marketing',
     'discount',
+    'discounts',
     'do it today',
     'don\'t delete',
     'don\'t hesitate',
