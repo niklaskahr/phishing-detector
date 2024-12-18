@@ -30,7 +30,6 @@ export class CacheService {
 
     this.loaderService.show();
 
-    console.info(`Cache for ${listName} is missing or invalid. Fetching data...`);
     await this.fetchAndCacheByType(listName);
     return JSON.parse(localStorage.getItem(cacheKey) || '[]');
   }
@@ -38,10 +37,7 @@ export class CacheService {
   private async checkAndFetch(sourceUrl: string, listName: ListType): Promise<void> {
     if (!this.isCacheValid(listName)) {
       this.loaderService.show();
-      console.info(`Cache for ${listName} is missing or invalid. Fetching data...`);
       await this.fetchAndCache(sourceUrl, listName);
-    } else {
-      console.info(`Cache for ${listName} is valid. Skipping fetch.`);
     }
   }
 

@@ -5,4 +5,5 @@ export interface Assessment {
   trustworthiness: number;
   riskLevel: RiskLevel;
   blacklistResults: BlacklistResults;
+  conspicuousFileSize?: number;
 }

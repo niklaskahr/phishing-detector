@@ -4,6 +4,7 @@ import { EmailData } from '../../shared/interfaces/email-data.interface';
 import { EventService } from '../../services/shared/event.service';
 import { StorageService } from '../../services/shared/storage.service';
 import { TrustworthinessGaugeComponent } from './trustworthiness-gauge/trustworthiness-gauge.component';
+import { FILE_SIZE } from '../../shared/constants/file-size.constant';
 @Component({
   selector: 'app-report',
   standalone: true,
@@ -25,5 +26,35 @@ export class ReportComponent implements OnInit {
       this.mostRecentAnalysis = data;
       this.hasBeenAssessed = true;
     });
+  }
+
+  get trustworthinessScore(): number {
+    return this.mostRecentAnalysis?.assessment.trustworthiness ?? 0;
+  }
+
+  get riskLevel(): string {
+    const level = this.mostRecentAnalysis?.assessment.riskLevel ?? 'Unknown';
+    return level.charAt(0).toUpperCase() + level.slice(1);
+  }
+
+  get fileSize(): string | null {
+    const sizeInBytes = this.mostRecentAnalysis?.assessment.conspicuousFileSize;
+    return sizeInBytes ? `${(sizeInBytes / (1024 * 1024)).toFixed(2)} MB` : null;
+  }
+
+  get attachments(): { name: string; type: string }[] {
+    return this.mostRecentAnalysis?.email.attachments ?? [];
+  }
+
+  get blacklistedDomains(): string[] {
+    return this.mostRecentAnalysis?.assessment.blacklistResults.blacklistedDomains ?? [];
+  }
+
+  get detectedJavaScript(): string[] {
+    return this.mostRecentAnalysis?.email.detectedJavaScript ?? [];
+  }
+
+  get phishingKeywords(): string[] {
+    return this.mostRecentAnalysis?.email.detectedPhishingKeywords ?? [];
   }
 }

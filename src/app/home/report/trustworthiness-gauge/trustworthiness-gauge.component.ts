@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 
 @Component({
   selector: 'app-trustworthiness-gauge',
@@ -6,18 +6,20 @@ import { Component, Input, OnInit } from '@angular/core';
   templateUrl: './trustworthiness-gauge.component.html',
   styleUrls: ['./trustworthiness-gauge.component.scss']
 })
-export class TrustworthinessGaugeComponent implements OnInit {
+export class TrustworthinessGaugeComponent implements OnChanges {
   @Input() score: number = 0;
   animatedScore: number = 0;
   Math = Math;
 
-  ngOnInit(): void {
-    this.animateScore();
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['score'] && changes['score'].currentValue !== changes['score'].previousValue) {
+      this.animateScore();
+    }
   }
 
   animateScore(): void {
     const animationDuration = 1000;
-    const steps = 120;
+    const steps = 60;
     const increment = this.score / steps;
     let current = 0;
 

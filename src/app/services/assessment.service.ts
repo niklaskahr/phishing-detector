@@ -18,7 +18,7 @@ export class AssessmentService {
   async assessTrustworthiness(data: ExtractedData): Promise<Assessment> {
     await this.blacklistService.ensureCacheValid(); // validate and populate the cache
 
-    let trustworthiness = 100; // starts at 100% trustworthy
+    let trustworthiness = 100;
 
     const { blacklistResults, trustPenalty: blacklistTrustPenalty } = this.checkAgainstBlacklist(data);
     trustworthiness -= this.calculateTrustPenalties(data, blacklistTrustPenalty);
@@ -26,11 +26,13 @@ export class AssessmentService {
     trustworthiness = Math.max(trustworthiness, 0); // prevent it from dropping below 0
 
     const riskLevel = this.determineTrustLevel(trustworthiness);
+    const conspicuousFileSize = this.isFileSizeConspicuous(data.fileSize) ? data.fileSize : undefined;
 
     return {
       trustworthiness,
       riskLevel,
       blacklistResults,
+      conspicuousFileSize,
     };
   }
 
@@ -63,7 +65,7 @@ export class AssessmentService {
       TRUST_PENALTIES.PHISHING_KEYWORDS_THRESHOLDS
     );
   }
-  
+
   private calculateDynamicTrustPenalty(
     count: number,
     basePenalty: number,
@@ -72,7 +74,7 @@ export class AssessmentService {
     if (count === 0) return 0;
     if (count <= thresholds.low) return count * basePenalty;
     if (count <= thresholds.medium) return count * (basePenalty * 1.5);
-  
+
     return count * (basePenalty * 2);
   }
 
@@ -123,6 +125,10 @@ export class AssessmentService {
       }
     }
     return { blacklistResults, trustPenalty };
+  }
+
+  private isFileSizeConspicuous(fileSize: number): boolean {
+    return fileSize >= FILE_SIZE.LARGE || fileSize <= FILE_SIZE.SMALL;
   }
 }
 

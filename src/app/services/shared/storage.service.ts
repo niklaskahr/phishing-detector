@@ -32,7 +32,7 @@ export class StorageService {
       this.saveToLocalStorage();
       this.eventService.notifyAnalysisStored(data);
     } else {
-      console.warn('Duplicate email detected. Skipping storage.'); // TODO: notify user
+      console.warn('Duplicate email detected. Skipping storage.'); // display analysis of that already existing email
     }
   }
 

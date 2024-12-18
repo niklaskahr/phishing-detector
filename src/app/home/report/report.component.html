@@ -2,13 +2,51 @@
     <ng-container *ngIf="hasBeenAssessed && mostRecentAnalysis; else explanation">
         <div class="report-container">
             <h2>Report</h2>
-            <app-trustworthiness-gauge [score]="82"></app-trustworthiness-gauge>
-            <pre>{{ mostRecentAnalysis | json | slice:0:200 }}...</pre>
+            <span class="margin-bottom"><u>{{ mostRecentAnalysis.email.subject }}</u></span>
+            <app-trustworthiness-gauge [score]="trustworthinessScore"></app-trustworthiness-gauge>
+            <div class="report-details">
+                <h3>Details</h3>
+                <p><strong>Risk Level:</strong> {{ riskLevel }}</p>
+                <p *ngIf="fileSize">
+                    ⚠️ The file size ({{ fileSize }}) is conspicuous and may indicate malicious content.
+                </p>
+                <div *ngIf="attachments.length">
+                    <div class="tags-container">
+                        <strong class="margin-auto">Attachments Included:</strong>
+                        <div class="tags-subcontainer">
+                            <span *ngFor="let attachment of attachments" class="tag">"{{ attachment.name }}" ({{
+                                attachment.type }})</span>
+                        </div>
+                    </div>
+                </div>
+                <div *ngIf="blacklistedDomains.length">
+                    <p><strong>Blacklisted Domains:</strong></p>
+                    <ul>
+                        <li *ngFor="let domain of blacklistedDomains">{{ domain }}</li>
+                    </ul>
+                </div>
+                <div *ngIf="detectedJavaScript.length">
+                    <div class="tags-container">
+                        <strong class="margin-auto">Detected JavaScript:</strong>
+                        <div class="tags-subcontainer">
+                            <span *ngFor="let js of detectedJavaScript" class="tag">{{ js }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div *ngIf="phishingKeywords.length">
+                    <div class="tags-container">
+                        <strong class="margin-auto">Detected Phishing Keywords:</strong>
+                        <div class="tags-subcontainer">
+                            <span *ngFor="let keyword of phishingKeywords" class="tag">{{ keyword }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </ng-container>
 
     <ng-template #explanation>
-        <div class="padding">
+        <div>
             <h2>How it works:</h2>
             <p>
                 After dropping your files, the app analyzes common email components and proceeds to assess them. During
@@ -21,8 +59,8 @@
                 <li>and checks the email's file size and any attached files.</li>
             </ul>
             <p>
-                Finally, it provides a conclusion regarding the email's trustworthiness based on these factors. Please
-                note that this app can only process emails written in English.
+                Finally, it provides a conclusion regarding the email's trustworthiness based on these factors.
+                <i>Please note that this app can only process emails written in English.</i>
             </p>
         </div>
     </ng-template>
