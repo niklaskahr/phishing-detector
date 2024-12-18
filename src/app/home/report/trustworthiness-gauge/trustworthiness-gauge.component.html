@@ -1,0 +1,24 @@
+<div class="gauge-container">
+    <svg class="gauge" viewBox="0 0 100 50">
+        <!-- background arc -->
+        <path class="gauge-bg" d="M10 50 A40 40 0 0 1 90 50" stroke="#ddd" stroke-width="10" stroke-linecap="round"
+            fill="none"></path>
+
+        <!-- foreground arc (Animated Progress) -->
+        <path class="gauge-progress" d="M10 50 A40 40 0 0 1 90 50" stroke="url(#gradient)" stroke-width="10"
+            stroke-linecap="round" fill="none" [attr.stroke-dasharray]="2 * Math.PI * 40 / 2"
+            [attr.stroke-dashoffset]="strokeDashoffset"></path>
+
+        <!-- gradient for the arc -->
+        <defs>
+            <linearGradient id="gradient" gradientTransform="rotate(0)">
+                <stop offset="0%" stop-color="#e74c3c" /> <!-- red -->
+                <stop offset="100%" stop-color="#2ecc71" /> <!-- green -->
+            </linearGradient>
+        </defs>
+    </svg>
+    <div class="gauge-score">
+        <h2>{{ animatedScore }}%</h2>
+        <span>Trustworthiness</span>
+    </div>
+</div>

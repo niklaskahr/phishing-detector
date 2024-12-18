@@ -1,0 +1,39 @@
+.gauge-container {
+    position: relative;
+    width: 200px;
+    height: 100px;
+    margin: auto;
+    text-align: center;
+}
+
+.gauge {
+    transform: rotate(0deg);
+}
+
+.gauge-bg {
+    stroke-linecap: round;
+}
+
+.gauge-progress {
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.1s linear;
+}
+
+.gauge-score {
+    position: absolute;
+    top: 52px;
+    left: 50%;
+    transform: translateX(-50%);
+
+    span {
+        color: #666;
+        font-size: 14px;
+    }
+
+    h2 {
+        margin: 0;
+        font-size: 24px;
+        font-weight: bold;
+        color: #333;
+    }
+}
