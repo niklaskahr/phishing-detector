@@ -1,0 +1,29 @@
+<div class="overlay standard-font">
+    <ng-container *ngIf="hasBeenAssessed && mostRecentAnalysis; else explanation">
+        <div class="report-container">
+            <h2>Report</h2>
+            <app-trustworthiness-gauge [score]="82"></app-trustworthiness-gauge>
+            <pre>{{ mostRecentAnalysis | json | slice:0:200 }}...</pre>
+        </div>
+    </ng-container>
+
+    <ng-template #explanation>
+        <div class="padding">
+            <h2>How it works:</h2>
+            <p>
+                After dropping your files, the app analyzes common email components and proceeds to assess them. During
+                this process, it:
+            </p>
+            <ul>
+                <li>compares the email content against up-to-date blacklists,</li>
+                <li>identifies common phishing keywords and phrases,</li>
+                <li>detects code that could execute (potentially dangerous) commands,</li>
+                <li>and checks the email's file size and any attached files.</li>
+            </ul>
+            <p>
+                Finally, it provides a conclusion regarding the email's trustworthiness based on these factors. Please
+                note that this app can only process emails written in English.
+            </p>
+        </div>
+    </ng-template>
+</div>
