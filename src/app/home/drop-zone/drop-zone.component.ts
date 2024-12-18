@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { EventService } from '../services/shared/event.service';
+import { EventService } from '../../services/shared/event.service';
 
 @Component({
   selector: 'app-drop-zone',
