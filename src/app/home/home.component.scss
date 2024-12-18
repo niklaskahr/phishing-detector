@@ -2,16 +2,16 @@
     height: calc(100vh - 20vh);
     width: 100%;
     display: flex;
+    justify-content: space-between;
     align-items: center;
 
-    div:nth-child(1) {
-        width: 50%;
-        text-align: center;
-        margin-right: 2rem;
+    app-report {
+        width: calc(50% - 2.5em);
+        height: 60%;
     }
 
     app-drop-zone {
         width: 50%;
-        height: 55%;
+        height: 60%;
     }
 }
