@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { EmailItemComponent } from './email-item/email-item.component';
-import { StorageService } from '../services/shared/storage.service';
-import { EmailData } from '../shared/interfaces/email-data.interface';
-import { EventService } from '../services/shared/event.service';
+import { StorageService } from '../../services/shared/storage.service';
+import { EmailData } from '../../shared/interfaces/email-data.interface';
+import { EventService } from '../../services/shared/event.service';
 
 @Component({
   selector: 'app-email-list',

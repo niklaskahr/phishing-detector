@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
-import { EmailData } from '../../shared/interfaces/email-data.interface';
-import { EventService } from '../../services/shared/event.service';
-import { StorageService } from '../../services/shared/storage.service';
+import { EmailData } from '../../../shared/interfaces/email-data.interface';
+import { EventService } from '../../../services/shared/event.service';
+import { StorageService } from '../../../services/shared/storage.service';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
