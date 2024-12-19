@@ -14,3 +14,17 @@ header {
     padding: 0 12vw;
     margin-left: -12vw;
 }
+
+@media (max-width: 750px) {
+    header {
+        height: unset;
+        flex-direction: column;
+        margin-bottom: 1em;
+    }
+}
+
+@media (max-width: 550px) {
+    h1 {
+        display: none;
+    }
+}
