@@ -1,4 +1,5 @@
 @import './assets/fonts.scss';
+@import 'https://fonts.googleapis.com/icon?family=Material+Icons';
 
 html {
     scroll-behavior: smooth;
@@ -37,10 +38,43 @@ a {
     cursor: pointer;
 }
 
+.logo {
+    object-fit: contain;
+    cursor: pointer;
+}
+
 .standard-font {
     font-size: 18px;
     font-weight: 400;
     line-height: 120%;
+}
+
+.button-bright {
+    display: inline-block;
+    font-family: "Overpass", sans-serif;
+    font-size: 18px;
+    font-weight: unset;
+    line-height: 120%;
+    padding: 10px 28px;
+    border: 4px solid black;
+    background-color: transparent;
+    cursor: pointer;
+    //'transition: all' causes conflicts with other animations
+    transition: font-weight 150ms, padding 150ms, filter 150ms, color 150ms, background-color 150ms, box-shadow 150ms;
+
+    &:hover {
+        font-weight: 700;
+        padding: 10px 38px;
+        filter: drop-shadow(5px 5px 15px rgba(0, 0, 0, 0.15));
+    }
+
+    &:active {
+        font-weight: 400;
+        color: #FFFCF3;
+        background-color: black;
+        padding: 10px 35px;
+        box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.15);
+    }
 }
 
 .error-message {
@@ -49,15 +83,57 @@ a {
     bottom: 3em;
 }
 
-.logo {
-    object-fit: contain;
-    cursor: pointer;
+/* scroll bar */
+/* Firefox */
+@supports (-moz-appearance: none) {
+    * {
+        scrollbar-width: auto;
+        scrollbar-color: #FF9900 #F9F9FF;
+    }
 }
 
-.inverted {
-    filter: invert(1);
+/* Chrome, Edge, and Safari */
+*::-webkit-scrollbar {
+    width: 14px;
 }
 
-.mb-1 {
-    margin-bottom: 0.5rem;
+*::-webkit-scrollbar-track {
+    background: #F9F9FF;
+}
+
+*::-webkit-scrollbar-thumb {
+    background-color: #FF9900;
+    border-radius: 8px;
+    border: 3px solid #F9F9FF;
+}
+
+
+@media (max-width: 500px) {
+    .button-bright {
+        display: inline-block;
+        font-family: "Overpass", sans-serif;
+        font-size: 18px;
+        font-weight: unset;
+        line-height: 120%;
+        padding: 6px 12px;
+        border: 4px solid black;
+        background-color: transparent;
+        cursor: pointer;
+        //'transition: all' causes conflicts with other animations
+        transition: font-weight 150ms, padding 150ms, filter 150ms, color 150ms, background-color 150ms, box-shadow 150ms;
+
+        &:hover {
+            font-weight: 700;
+            padding: 6px 18px;
+            filter: drop-shadow(5px 5px 15px rgba(0, 0, 0, 0.15));
+        }
+
+        &:active {
+            font-weight: 400;
+            color: #FFFCF3;
+            background-color: black;
+            padding: 6px 15px;
+            box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.15);
+        }
+    }
 }

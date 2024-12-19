@@ -1,4 +1,7 @@
 <div class="home-container">
-    <app-report></app-report>
-    <app-drop-zone></app-drop-zone>
+    <app-email-list></app-email-list>
+    <div class="home-subcontainer">
+        <app-report [email]="selectedEmail!"></app-report>
+        <app-drop-zone></app-drop-zone>
+    </div>
 </div>

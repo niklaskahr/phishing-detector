@@ -26,7 +26,7 @@ export class AssessmentService {
     trustworthiness = Math.max(trustworthiness, 0); // prevent it from dropping below 0
 
     const riskLevel = this.determineTrustLevel(trustworthiness);
-    const conspicuousFileSize = this.isFileSizeConspicuous(data.fileSize) ? data.fileSize : undefined;
+    const conspicuousFileSize = this.isFileSizeConspicuous(data.fileSize) ? data.fileSize : null;
 
     return {
       trustworthiness,
@@ -95,8 +95,9 @@ export class AssessmentService {
     return RiskLevel.Low;
   }
 
-  private checkAgainstBlacklist(data: ExtractedData): { blacklistResults: BlacklistResults, trustPenalty: number } {
-    const blacklistResults: BlacklistResults = { blacklistedDomains: [], blacklistedTLDs: [] };
+  private checkAgainstBlacklist(data: ExtractedData): { blacklistResults: BlacklistResults; trustPenalty: number } {
+    const blacklistDomainsSet = new Set<string>();
+    const blacklistTLDsSet = new Set<string>();
 
     const itemsToCheck = [
       data.sender,
@@ -114,17 +115,24 @@ export class AssessmentService {
       const tld = item.split('.').pop();
       const isBlacklistedTLD = tld ? this.blacklistService.isCachedTLDBlacklisted(tld) : false;
 
-      if (isBlacklistedDomain) {
-        blacklistResults.blacklistedDomains?.push(item);
-        trustPenalty += TRUST_PENALTIES.BLACKLISTED_DOMAIN
+      if (isBlacklistedDomain && !blacklistDomainsSet.has(item)) {
+        blacklistDomainsSet.add(item);
+        trustPenalty += TRUST_PENALTIES.BLACKLISTED_DOMAIN;
       }
 
-      if (isBlacklistedTLD) {
-        blacklistResults.blacklistedTLDs?.push(tld!);
-        trustPenalty += TRUST_PENALTIES.BLACKLISTED_TLD
+      if (isBlacklistedTLD && tld && !blacklistTLDsSet.has(tld)) {
+        blacklistTLDsSet.add(tld);
+        trustPenalty += TRUST_PENALTIES.BLACKLISTED_TLD;
       }
     }
-    return { blacklistResults, trustPenalty };
+
+    return {
+      blacklistResults: {
+        blacklistedDomains: Array.from(blacklistDomainsSet),
+        blacklistedTLDs: Array.from(blacklistTLDsSet),
+      },
+      trustPenalty,
+    };
   }
 
   private isFileSizeConspicuous(fileSize: number): boolean {

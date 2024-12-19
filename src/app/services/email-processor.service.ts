@@ -25,17 +25,6 @@ export class EmailProcessorService {
     const returnPath = this.extractHeader(rawHeaders, /^Return-Path:\s*(?:.*<)?([\w.-]+@[\w.-]+)(?:>)?/m);
     const subject = this.cleanSubject(this.extractHeader(rawHeaders, /^Subject:\s*(.+)/m) || '');
 
-    // const senderMatch = rawHeaders.match(/^From:\s*(?:.*<)?([\w.-]+@[\w.-]+)(?:>)?/m);
-    // const replyToMatch = rawHeaders.match(/^Reply-To:\s*(?:.*<)?([\w.-]+@[\w.-]+)(?:>)?/m);
-    // const returnPathMatch = rawHeaders.match(/^Return-Path:\s*(?:.*<)?([\w.-]+@[\w.-]+)(?:>)?/m);
-    // const subjectMatch = rawHeaders.match(/^Subject:\s*(.+)/m);
-    // const cleanedSubject = subjectMatch?.[1] ? this.cleanSubject(subjectMatch[1]) : '';
-    // const domainMatches = this.detectDomains(fileContent);
-
-    // const detectedJavaScript = this.detectJavaScript(rawEmail);
-    // const detectedPhishingKeywords = this.detectPhishingKeywords(`${subjectMatch?.[1]}\n${rawEmail}`);
-    // const unsafeAttachments = this.extractUnsafeAttachments(fileContent);
-
     return {
       sender: sender || '',
       replyTo: replyTo || '',

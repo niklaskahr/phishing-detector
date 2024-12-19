@@ -1,0 +1,50 @@
+h2 {
+    margin-top: 0;
+}
+
+.email-list-container {
+    display: flex;
+    flex-direction: column;
+    background-color: #FFFFFF;
+    border-radius: 8px;
+    padding: 1em;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+    .email-list-subcontainer {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        gap: 0.5em;
+        overflow-x: auto;
+        padding-bottom: 0.25em;
+
+        app-email-list {
+            height: 100%;
+        }
+    }
+
+    app-email-list {
+        height: 100%;
+    }
+}
+
+ng-template {
+    background-color: #FFFFFF;
+}
+
+/* scroll bar */
+/* Firefox */
+@supports (-moz-appearance: none) {
+    * {
+        scrollbar-color: #FF9900 #FFFFFF;
+    }
+}
+
+/* Chrome, Edge, and Safari */
+*::-webkit-scrollbar-track {
+    background: #FFFFFF;
+}
+
+*::-webkit-scrollbar-thumb {
+    border: 3px solid #FFFFFF;
+}

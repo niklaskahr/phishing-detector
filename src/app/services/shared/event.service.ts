@@ -8,8 +8,10 @@ import { EmailData } from '../../shared/interfaces/email-data.interface';
 export class EventService {
   private filesDroppedSubject = new Subject<File[]>();
   private analysisStoredSubject = new Subject<EmailData>();
+  private emailDeletedSubject = new Subject<EmailData>();
   filesDropped$ = this.filesDroppedSubject.asObservable();
   analysisStored$ = this.analysisStoredSubject.asObservable();
+  emailDeleted$ = this.emailDeletedSubject.asObservable();
 
   notifyFilesDropped(files: File[]): void {
     this.filesDroppedSubject.next(files);
@@ -17,5 +19,9 @@ export class EventService {
 
   notifyAnalysisStored(data: EmailData): void {
     this.analysisStoredSubject.next(data);
+  }
+
+  notifyEmailDeleted(data: EmailData): void {
+    this.emailDeletedSubject.next(data);
   }
 }

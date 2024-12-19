@@ -1,0 +1,11 @@
+<div class="email-list-container">
+    <ng-container *ngIf="emails.length; else noEmails">
+        <div class="email-list-subcontainer">
+            <app-email-item *ngFor="let email of emails; let i = index" [email]="email">
+            </app-email-item>
+        </div>
+    </ng-container>
+    <ng-template #noEmails>
+        <span><strong>Stored Emails: </strong>Analyzed emails will be shown here.</span>
+    </ng-template>
+</div>

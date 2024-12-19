@@ -1,16 +1,45 @@
 .home-container {
-    height: calc(100vh - 20vh);
-    width: 100%;
+    min-height: calc(100vh - 20vh);
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column;
+    justify-content: space-evenly;
+
+    app-email-list {
+        display: block;
+    }
+
+    .home-subcontainer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        app-report {
+            width: calc(55% - 2.5em);
+        }
+
+        app-drop-zone {
+            width: 45%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+        }
+    }
+}
+
+@media (max-width: 1250px) {
+    app-email-list {
+        margin-bottom: 1em
+    }
 
     app-report {
-        width: calc(55% - 2.5em);
+        width: unset !important;
     }
 
     app-drop-zone {
-        width: 45%;
-        height: 65%;
+        width: 75% !important;
+    }
+
+    .home-subcontainer {
+        flex-direction: column;
     }
 }

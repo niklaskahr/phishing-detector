@@ -21,18 +21,23 @@ export class StorageService {
     }
   }
 
-  async storeData(data: EmailData): Promise<void> {
-    if (!isPlatformBrowser(this.platformId)) return;
+  async storeData(data: EmailData): Promise<boolean> {
+    if (!isPlatformBrowser(this.platformId)) return false;
 
-    const hash = await HashingUtil.generateHash(data.email); // generate a hash to detect duplicates
+    const hash = await HashingUtil.generateHash(data.email);
 
     if (!this.emailHashes.has(hash)) {
       this.emailHashes.add(hash);
       this.dataStore.set(hash, data);
       this.saveToLocalStorage();
       this.eventService.notifyAnalysisStored(data);
+      return true;
     } else {
-      console.warn('Duplicate email detected. Skipping storage.'); // display analysis of that already existing email
+      const existingData = this.dataStore.get(hash);
+      if (existingData) {
+        this.eventService.notifyAnalysisStored(existingData);
+      }
+      return false;
     }
   }
 
@@ -40,15 +45,11 @@ export class StorageService {
     return Array.from(this.dataStore.values());
   }
 
-  // getDataByHash(hash: string): EmailData | undefined {
-  //   return this.dataStore.get(hash);
-  // }
-
   private saveToLocalStorage(): void {
     if (!isPlatformBrowser(this.platformId)) return;
 
     const serializedData = JSON.stringify(Array.from(this.dataStore.entries()));
-    // localStorage.setItem(this.LOCAL_STORAGE_KEY, serializedData);
+    localStorage.setItem(this.LOCAL_STORAGE_KEY, serializedData);
   }
 
   private loadFromLocalStorage(): void {
@@ -59,6 +60,17 @@ export class StorageService {
       const parsedEntries: [string, EmailData][] = JSON.parse(savedData);
       this.dataStore = new Map(parsedEntries);
       this.emailHashes = new Set(parsedEntries.map(([hash]) => hash));
+    }
+  }
+
+  async removeData(email: EmailData): Promise<void> {
+    if (!isPlatformBrowser(this.platformId)) return;
+
+    const hash = await HashingUtil.generateHash(email.email);
+    if (this.emailHashes.has(hash)) {
+      this.emailHashes.delete(hash);
+      this.dataStore.delete(hash);
+      this.saveToLocalStorage();
     }
   }
 }

@@ -1,0 +1,34 @@
+.email-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 18px;
+    background-color: lightgray;
+    padding: 0.25em 1.5em;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    filter: unset;
+    transition: 200ms;
+    cursor: pointer;
+
+    &:hover {
+        filter: brightness(1.05);
+        transition: 200ms;
+    }
+
+    span {
+        white-space: nowrap;
+        margin-right: 0.75em;
+        margin-bottom: -1px;
+    }
+
+    button {
+        color: darkred;
+        transition: 200ms;
+
+        &:hover {
+            color: red;
+            transition: 200ms;
+        }
+    }
+}

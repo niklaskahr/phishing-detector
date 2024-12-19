@@ -14,8 +14,10 @@ import { CacheService } from './services/shared/cache.service';
   styleUrl: './app.component.scss'
 })
 export class AppComponent implements OnInit {
-  constructor(private cacheService: CacheService,
-    private emailAuditService: EmailAuditService) { }
+  constructor(
+    private cacheService: CacheService,
+    private emailAuditService: EmailAuditService
+  ) { }
 
   async ngOnInit(): Promise<void> {
     await this.cacheService.fetchAndCacheAll();

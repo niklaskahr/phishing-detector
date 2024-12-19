@@ -1,10 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { EmailData } from '../../shared/interfaces/email-data.interface';
 import { EventService } from '../../services/shared/event.service';
 import { StorageService } from '../../services/shared/storage.service';
 import { TrustworthinessGaugeComponent } from './trustworthiness-gauge/trustworthiness-gauge.component';
-import { FILE_SIZE } from '../../shared/constants/file-size.constant';
+
 @Component({
   selector: 'app-report',
   standalone: true,
@@ -13,6 +13,7 @@ import { FILE_SIZE } from '../../shared/constants/file-size.constant';
   styleUrl: './report.component.scss'
 })
 export class ReportComponent implements OnInit {
+  @Input() email: EmailData | null = null;
   hasBeenAssessed: boolean = false;
   mostRecentAnalysis: EmailData | undefined;
 
@@ -29,7 +30,7 @@ export class ReportComponent implements OnInit {
   }
 
   get trustworthinessScore(): number {
-    return this.mostRecentAnalysis?.assessment.trustworthiness ?? 0;
+    return this.email?.assessment?.trustworthiness ?? 0;
   }
 
   get riskLevel(): string {
@@ -39,7 +40,7 @@ export class ReportComponent implements OnInit {
 
   get fileSize(): string | null {
     const sizeInBytes = this.mostRecentAnalysis?.assessment.conspicuousFileSize;
-    return sizeInBytes ? `${(sizeInBytes / (1024 * 1024)).toFixed(2)} MB` : null;
+    return sizeInBytes != null ? `${(sizeInBytes / (1024 * 1024)).toFixed(2)} MB` : null;
   }
 
   get attachments(): { name: string; type: string }[] {
