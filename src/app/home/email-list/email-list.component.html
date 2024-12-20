@@ -1,3 +1,4 @@
+<button class="button-bright" (click)="clearList()">Clear List</button>
 <div class="email-list-container">
     <ng-container *ngIf="emails.length; else noEmails">
         <div class="email-list-subcontainer">
@@ -6,6 +7,6 @@
         </div>
     </ng-container>
     <ng-template #noEmails>
-        <span><strong>Stored Emails: </strong>Analyzed emails will be shown here.</span>
+        <span class="storage-info"><strong>Stored Emails: </strong>Analyzed emails will be shown here.</span>
     </ng-template>
 </div>

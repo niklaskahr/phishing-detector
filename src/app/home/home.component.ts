@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { DropZoneComponent } from './drop-zone/drop-zone.component';
 import { ReportComponent } from './report/report.component';
-import { EmailListComponent } from '../email-list/email-list.component';
+import { EmailListComponent } from './email-list/email-list.component';
 import { EmailData } from '../shared/interfaces/email-data.interface';
 import { EventService } from '../services/shared/event.service';
 

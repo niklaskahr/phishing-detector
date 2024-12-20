@@ -73,4 +73,13 @@ export class StorageService {
       this.saveToLocalStorage();
     }
   }
+
+  clearAllData(): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+
+    this.dataStore.clear();
+    this.emailHashes.clear();
+    localStorage.removeItem(this.LOCAL_STORAGE_KEY);
+  }
+
 }

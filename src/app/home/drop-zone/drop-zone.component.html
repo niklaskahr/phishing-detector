@@ -1,7 +1,7 @@
 <div class="overlay" (drop)="handleDrop($event)" (dragover)="handleDragOver($event)" (dragleave)="handleDragLeave()"
     [ngClass]="{ 'drag-hover': isHovered }">
     <span class="file-format">.eml</span>
-    <span class="margin-bottom">Drop one or more email files here.</span>
+    <span class="margin-bottom">Drop one or more files here.</span>
     <button class="button-bright" (click)="triggerFileInput()">Choose File</button>
     <input 
       #fileInput 

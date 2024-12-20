@@ -30,7 +30,7 @@ export class EmailAuditService {
       const data: EmailData = { email: extractedData, assessment: riskAssessment };
       await this.storageService.storeData(data);
 
-      const isNewData = await this.storageService.storeData(data); // Store data and check if new
+      const isNewData = await this.storageService.storeData(data); // TODO: DOES NOT WORK PROPERLY
       if (!isNewData) {
         console.log(`Email "${file.name}" is a duplicate and was not reprocessed.`);
       }

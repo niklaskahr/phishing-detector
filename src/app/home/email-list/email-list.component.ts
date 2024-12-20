@@ -31,4 +31,9 @@ export class EmailListComponent implements OnInit {
       this.emails = this.storageService.getData();
     });
   }
+
+  clearList(): void {
+    this.storageService.clearAllData();
+    this.emails = [];
+  }  
 }

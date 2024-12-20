@@ -26,10 +26,25 @@ h2 {
     app-email-list {
         height: 100%;
     }
+
+    .storage-info {
+        font-size: 18px;
+    }
 }
 
-ng-template {
-    background-color: #FFFFFF;
+.button-bright {
+    display: block;
+    line-height: unset;
+    padding: 6px 12px;
+    margin: 0 0 0.5em auto;
+
+    &:hover {
+        padding: 6px 18px;
+    }
+
+    &:active {
+        padding: 6px 15px;
+    }
 }
 
 /* scroll bar */
