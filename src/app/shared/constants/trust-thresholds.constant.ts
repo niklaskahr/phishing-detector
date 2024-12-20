@@ -1,4 +1,4 @@
 export const TRUST_THRESHOLDS = {
   LOW: 70,
-  MEDIUM: 40,
+  MEDIUM: 55,
 };

@@ -1,5 +1,5 @@
 <div (click)="onViewEmail()" class="email-item">
-  <span>{{ email.email.subject | slice:0:40 }}{{ email.email.subject.length > 50 ? '...' : '' }}</span>
+  <span>{{ email.email.subject | slice:0:35 }}{{ email.email.subject.length > 35 ? '...' : '' }}</span>
   <button mat-icon-button (click)="onDeleteEmail()" aria-label="Delete">
     <mat-icon>delete</mat-icon>
   </button>

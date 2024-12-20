@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { ExtractedData } from '../shared/interfaces/extracted-data.interface';
-import { PHISHING_KEYWORDS } from '../shared/constants/phishing-keywords.constant';
 import { AttachmentDetails } from '../shared/interfaces/attachment-details.interface';
-import { UNSAFE_FILE_EXTENSIONS } from '../shared/constants/unsafe-file-extensions.constant';
 import { FileReaderUtil } from '../shared/utils/file-reader.util';
+import { PHISHING_KEYWORDS } from '../shared/constants/phishing-keywords.constant';
+import { UNSAFE_FILE_EXTENSIONS } from '../shared/constants/unsafe-file-extensions.constant';
 
 @Injectable({
   providedIn: 'root'
@@ -24,16 +24,17 @@ export class EmailProcessorService {
     const replyTo = this.extractHeader(rawHeaders, /^Reply-To:\s*(?:.*<)?([\w.-]+@[\w.-]+)(?:>)?/m);
     const returnPath = this.extractHeader(rawHeaders, /^Return-Path:\s*(?:.*<)?([\w.-]+@[\w.-]+)(?:>)?/m);
     const subject = this.cleanSubject(this.extractHeader(rawHeaders, /^Subject:\s*(.+)/m) || '');
+    const decodedBody = this.decodeBody(rawEmail);
 
     return {
       sender: sender || '',
       replyTo: replyTo || '',
       returnPath: returnPath || '',
-      domains: this.detectDomains(fileContent),
+      domains: this.detectDomains(decodedBody),
       subject: subject,
-      rawEmail: rawEmail || '',
-      detectedJavaScript: this.detectJavaScript(rawEmail),
-      detectedPhishingKeywords: this.detectPhishingKeywords(`${subject}\n${rawEmail}`),
+      rawEmail: decodedBody || '',
+      detectedJavaScript: this.detectJavaScript(decodedBody),
+      detectedPhishingKeywords: this.detectPhishingKeywords(`${subject}\n${decodedBody}`),
       fileSize: this.fileSize,
       attachments: this.extractUnsafeAttachments(fileContent),
     };
@@ -54,34 +55,49 @@ export class EmailProcessorService {
   }
 
   private cleanSubject(subject: string): string {
-    // unfold multiline subject headers into a single line
     subject = subject.replace(/\r?\n[ \t]+/g, ' ');
 
-    // decode all MIME-encoded words and combine with plain text
-    subject = subject.replace(/=\?UTF-8\?B\?([A-Za-z0-9+/=]+)\?=/g, (_, base64) => {
+    subject = subject.replace(/=\?([\w\-]+)\?(Q|B)\?(.+?)\?=/gi, (_, charset, encoding, encodedText) => {
       try {
-        return atob(base64);
+        if (encoding.toUpperCase() === 'Q') {
+          return encodedText
+            .replace(/_/g, ' ')
+            .replace(/=([0-9A-Fa-f]{2})/g, (_: any, hex: string) =>
+              String.fromCharCode(parseInt(hex, 16))
+            );
+        } else if (encoding.toUpperCase() === 'B') {
+          return atob(encodedText);
+        }
       } catch {
         return '';
       }
+
+      return '';
     });
 
     subject = this.fixCorruptedUtf8(subject);
-    subject = this.removeEmojis(subject);
-
     return subject.replace(/\s{2,}/g, ' ').trim();
   }
 
-  private removeEmojis(input: string): string {
-    const corruptedReplacements = [
-      'âï¸',
-    ];
+  private decodeBody(rawEmail: string): string {
+    try {
+      const quotedPrintableDecoded = rawEmail.replace(/=([0-9A-Fa-f]{2})/g, (_, hex) =>
+        String.fromCharCode(parseInt(hex, 16))
+      );
 
-    corruptedReplacements.forEach(corrupted => {
-      input = input.replace(new RegExp(corrupted, 'g'), '');
-    });
+      let decoded = atob(quotedPrintableDecoded);
+      decoded = this.fixCorruptedUtf8(decoded);
 
-    return input.replace(/[\p{Emoji}\p{Emoji_Presentation}\p{Extended_Pictographic}\uFE0F]/gu, '');
+      const htmlDecoded = decoded.replace(/&#(\d+);/g, (_, code) =>
+        String.fromCharCode(parseInt(code, 10))
+      );
+
+      const plainText = htmlDecoded.replace(/<[^>]*>/g, '');
+
+      return plainText.trim();
+    } catch {
+      return this.fixCorruptedUtf8(rawEmail);
+    }
   }
 
   private fixCorruptedUtf8(input: string): string {
@@ -93,12 +109,23 @@ export class EmailProcessorService {
       'Ã¨': 'è',
       'âï¸': '',
       'ð': '',
+      'Ü¿': '',
     };
-    return input.replace(/â|â|â¦|Ã©|Ã¨|ð/g, (match) => replacements[match] || '');
+
+    let fixed = input.replace(
+      new RegExp(Object.keys(replacements).join('|'), 'g'),
+      (match) => replacements[match] || ''
+    );
+
+    fixed = fixed.replace(/\b([A-Z][a-z]*)\s([A-Z])/g, '$1$2');
+    fixed = fixed.replace(/([a-z])([A-Z])/g, '$1 $2');
+    fixed = fixed.replace(/\s{2,}/g, ' ');
+
+    return fixed.trim();
   }
 
-  private detectDomains(fileContent: string): string[] {
-    const cleanedUrlMatches = fileContent
+  private detectDomains(decodedBody: string): string[] {
+    const cleanedUrlMatches = decodedBody
       .match(/https?:\/\/[^\s"<>]+/g)
       ?.map(url =>
         url.replace(/=([0-9A-Fa-f]{2})/g, (_, hex) => String.fromCharCode(parseInt(hex, 16))) // decode hexadecimal entities
@@ -120,7 +147,7 @@ export class EmailProcessorService {
     ];
   }
 
-  private detectJavaScript(email: string): string[] {
+  private detectJavaScript(decodedBody: string): string[] {
     const executionPatterns: { pattern: RegExp; label: string }[] = [
       { pattern: /<script[\s\S]*?>[\s\S]*?<\/script>/i, label: '<script> Tag' },
       { pattern: /<[^>]+on\w+\s*=\s*["']?[^"'>]*["']?/i, label: 'Inline Event Handler' },
@@ -133,7 +160,7 @@ export class EmailProcessorService {
     ];
 
     return executionPatterns
-      .filter(({ pattern }) => pattern.test(email))
+      .filter(({ pattern }) => pattern.test(decodedBody))
       .map(({ label }) => label);
   }
 

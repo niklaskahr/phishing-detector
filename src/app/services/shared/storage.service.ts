@@ -31,12 +31,14 @@ export class StorageService {
       this.dataStore.set(hash, data);
       this.saveToLocalStorage();
       this.eventService.notifyAnalysisStored(data);
+
       return true;
     } else {
       const existingData = this.dataStore.get(hash);
       if (existingData) {
         this.eventService.notifyAnalysisStored(existingData);
       }
+
       return false;
     }
   }
@@ -81,5 +83,4 @@ export class StorageService {
     this.emailHashes.clear();
     localStorage.removeItem(this.LOCAL_STORAGE_KEY);
   }
-
 }
