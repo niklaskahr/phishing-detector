@@ -1,6 +1,6 @@
-<button class="button-bright" (click)="clearList()">Clear List</button>
 <div class="email-list-container">
     <ng-container *ngIf="emails.length; else noEmails">
+        <button class="button-bright" (click)="clearList()">Clear List</button>
         <div class="email-list-subcontainer">
             <app-email-item *ngFor="let email of emails; let i = index" [email]="email">
             </app-email-item>

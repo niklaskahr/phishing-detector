@@ -28,15 +28,25 @@
 
 @media (max-width: 1200px) {
     .overlay {
-        height: unset;
-        padding: 2.25vh 12vw;
+        padding: 2.25vh 12vw 2.25vh;
+    }
+}
+
+@media (max-width: 1000px) {
+    .overlay {
+        height: unset !important;
 
         footer {
+            display: flex;
+            flex-direction: column;
             align-items: center;
-            flex-direction: column-reverse;
+
+            .standard-font {
+                margin-bottom: 1em;
+            }
 
             .disclaimer {
-                margin-bottom: 1em;
+                width: unset;
             }
         }
     }

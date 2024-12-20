@@ -3,6 +3,7 @@ h2 {
 }
 
 .email-list-container {
+    max-height: 20vh;
     display: flex;
     flex-direction: column;
     background-color: #FFFFFF;
@@ -12,11 +13,9 @@ h2 {
 
     .email-list-subcontainer {
         display: flex;
-        justify-content: flex-start;
-        align-items: center;
+        flex-direction: column;
         gap: 0.5em;
-        overflow-x: auto;
-        padding-bottom: 0.25em;
+        overflow-y: auto;
 
         app-email-list {
             height: 100%;

@@ -1,7 +1,7 @@
 <div class="home-container">
-    <app-email-list></app-email-list>
+    <app-report [email]="selectedEmail!"></app-report>
     <div class="home-subcontainer">
-        <app-report [email]="selectedEmail!"></app-report>
+        <app-email-list></app-email-list>
         <app-drop-zone></app-drop-zone>
     </div>
 </div>

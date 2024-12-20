@@ -14,7 +14,6 @@ ul {
 }
 
 .overlay {
-    height: 100%;
     background-color: #FFFFFF;
     border-radius: 8px;
     padding: 1em;
@@ -22,7 +21,6 @@ ul {
 
 
     .report-container {
-        height: calc(100% - 2em);
         display: flex;
         flex-direction: column;
 
@@ -46,7 +44,7 @@ ul {
         }
 
         .tags-subcontainer {
-            max-height: calc((16px + 6px + 4px + 4px + 0.35em) * 3);
+            max-height: calc((16px + 6px + 4px + 4px + 0.35em) * 2);
             overflow-y: auto;
             gap: 0.35em;
             display: flex;
@@ -82,11 +80,4 @@ ul {
 
 *::-webkit-scrollbar-thumb {
     border: 3px solid #FFFFFF;
-}
-
-
-@media (max-width: 1250px) {
-    .overlay {
-        margin-bottom: 1em;
-    }
 }
